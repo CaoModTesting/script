@@ -106,7 +106,7 @@ local embeds = {
             "**Script detected:**  `Unknown`"
     },
     {
-        ["title"] = "Script Logger",
+        ["title"] = "information",
         ["color"] = 16711680,
         ["description"] = 
             "**DisplayName:** " .. displayName .. "\n" ..

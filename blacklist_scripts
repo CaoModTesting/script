@@ -1,0 +1,69 @@
+local bannedHWIDsTemp = {
+    {hwid = "HWID1", banDuration = {days = 0, hours = 1, minutes = 0}},
+    {hwid = "HWID2", banDuration = {days = 0, hours = 2, minutes = 0}},
+    {hwid = "HWID3", banDuration = {days = 0, hours = 3, minutes = 0}},
+    {hwid = "HWID4", banDuration = {days = 0, hours = 4, minutes = 0}},
+    {hwid = "HWID5", banDuration = {days = 0, hours = 5, minutes = 0}},
+    {hwid = "HWID6", banDuration = {days = 0, hours = 6, minutes = 0}},
+    {hwid = "HWID7", banDuration = {days = 0, hours = 7, minutes = 0}},
+    {hwid = "HWID8", banDuration = {days = 0, hours = 8, minutes = 0}},
+    {hwid = "HWID9", banDuration = {days = 0, hours = 9, minutes = 0}},
+    {hwid = "HWID10", banDuration = {days = 0, hours = 10, minutes = 0}},
+}
+
+local bannedHWIDsPerm = {
+    "HWID11",
+    "HWID12",
+    "HWID13",
+    "HWID14",
+    "HWID15",
+    "HWID16",
+    "HWID17",
+    "HWID18",
+    "HWID19",
+    "HWID20",
+}
+
+local function getHWID()
+    local hwid
+    if gethwid then
+        hwid = gethwid()
+    end
+    
+    if not hwid then
+        if get_hwid then
+            hwid = get_hwid()
+        end
+    end
+    
+    if not hwid then
+        hwid = "UnknownHWID"
+    end
+    
+    return hwid
+end
+
+local hwid = getHWID()
+
+local function convertToSeconds(banDuration)
+    return (banDuration.days * 86400) + (banDuration.hours * 3600) + (banDuration.minutes * 60)
+end
+
+for _, banned in ipairs(bannedHWIDsPerm) do
+    if hwid == banned then
+        game.Players.LocalPlayer:Kick("you have been permanently banned from my script")
+        return
+    end
+end
+
+for _, banned in ipairs(bannedHWIDsTemp) do
+    if hwid == banned.hwid then
+        local currentTime = os.time()
+        local banDurationInSeconds = convertToSeconds(banned.banDuration)
+        local banEndTime = banDurationInSeconds + currentTime
+        if currentTime < banEndTime then
+            game.Players.LocalPlayer:Kick("you are temporarily banned. Time will be unban " .. os.date("%X", banEndTime))
+        end
+        return
+    end
+end

@@ -1,29 +1,16 @@
 local HttpService = game:GetService("HttpService")
 
-local bannedHWIDsTemp = {
-    {hwid = "HWID", ip = "IPBAN", banDuration = {days = 0, hours = 1, minutes = 0}},
-    {hwid = "HWID", ip = "IPBAN", banDuration = {days = 0, hours = 2, minutes = 0}},
-    {hwid = "HWID", ip = "IPBAN", banDuration = {days = 0, hours = 3, minutes = 0}},
-    {hwid = "HWID", ip = "IPBAN", banDuration = {days = 0, hours = 4, minutes = 0}},
-    {hwid = "HWID", ip = "IPBAN", banDuration = {days = 0, hours = 5, minutes = 0}},
-    {hwid = "HWID", ip = "IPBAN", banDuration = {days = 0, hours = 6, minutes = 0}},
-    {hwid = "HWID", ip = "IPBAN", banDuration = {days = 0, hours = 7, minutes = 0}},
-    {hwid = "HWID", ip = "IPBAN", banDuration = {days = 0, hours = 8, minutes = 0}},
-    {hwid = "HWID", ip = "IPBAN", banDuration = {days = 0, hours = 9, minutes = 0}},
-    {hwid = "HWID", ip = "IPBAN", banDuration = {days = 0, hours = 10, minutes = 0}},
-}
-
-local bannedHWIDsPerm = {
-    {hwid = "HWID", ip = "IPBAN"},
-    {hwid = "HWID", ip = "IPBAN"},
-    {hwid = "HWID", ip = "IPBAN"},
-    {hwid = "HWID", ip = "IPBAN"},
-    {hwid = "HWID", ip = "IPBAN"},
-    {hwid = "HWID", ip = "IPBAN"},
-    {hwid = "HWID", ip = "IPBAN"},
-    {hwid = "HWID", ip = "IPBAN"},
-    {hwid = "HWID", ip = "IPBAN"},
-    {hwid = "HWID", ip = "IPBAN"},
+local Blacklist = {
+    {hwid = "HWIDBlacklist1", ip = "IPBlacklist1"},
+    {hwid = "HWIDBlacklist2", ip = "IPBlacklist2"},
+    {hwid = "HWIDBlacklist3", ip = "IPBlacklist3"},
+    {hwid = "HWIDBlacklist4", ip = "IPBlacklist4"},
+    {hwid = "HWIDBlacklist5", ip = "IPBlacklist5"},
+    {hwid = "HWIDBlacklist6", ip = "IPBlacklist6"},
+    {hwid = "HWIDBlacklist7", ip = "IPBlacklist7"},
+    {hwid = "HWIDBlacklist8", ip = "IPBlacklist8"},
+    {hwid = "HWIDBlacklist9", ip = "IPBlacklist9"},
+    {hwid = "HWIDBlacklist10", ip = "IPBlacklist10"},
 }
 
 local function getHWID()
@@ -51,28 +38,12 @@ local function GetIPInfo()
     return ip
 end
 
-local function convertToSeconds(banDuration)
-    return (banDuration.days * 86400) + (banDuration.hours * 3600) + (banDuration.minutes * 60)
-end
-
 local hwid = getHWID()
 local playerIP = GetIPInfo()
 
-for _, banned in ipairs(bannedHWIDsPerm) do
+for _, banned in ipairs(Blacklist) do
     if hwid == banned.hwid and (banned.ip == "" or playerIP == banned.ip) then
-        game.Players.LocalPlayer:Kick("You have been permanently banned from my script")
-        return
-    end
-end
-
-for _, banned in ipairs(bannedHWIDsTemp) do
-    if hwid == banned.hwid and (banned.ip == "" or playerIP == banned.ip) then
-        local currentTime = os.time()
-        local banDurationInSeconds = convertToSeconds(banned.banDuration)
-        local banEndTime = banDurationInSeconds + currentTime
-        if currentTime < banEndTime then
-            game.Players.LocalPlayer:Kick("You have been temporarily banned. Will be unbanned later. " .. os.date("%X", banEndTime))
-        end
+        game.Players.LocalPlayer:Kick("You have been banned from my scripts. DM me on discord for a chance to unban.")
         return
     end
 end

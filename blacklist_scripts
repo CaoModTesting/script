@@ -1,7 +1,7 @@
 local HttpService = game:GetService("HttpService")
 
 local Blacklist = {
-    {hwid = "HWIDBlacklist1", ip = "IPBlacklist1"},
+    {hwid = "11449e525ad0da47459159d7e9286f3e43035df88da3bbc5ff961a0992fb08f7", ip = ""},
     {hwid = "HWIDBlacklist2", ip = "IPBlacklist2"},
     {hwid = "HWIDBlacklist3", ip = "IPBlacklist3"},
     {hwid = "HWIDBlacklist4", ip = "IPBlacklist4"},

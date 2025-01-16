@@ -103,10 +103,10 @@ local embeds = {
         ["title"] = "Scripts Logger",
         ["color"] = 65280,
         ["description"] = 
-            "**Script detected:**  `Fe 1k Killstreak`"
+            "**Script detected:**  `" .. getgenv().customScriptText .. "`"
     },
     {
-        ["title"] = "information",
+        ["title"] = "Information",
         ["color"] = 16711680,
         ["description"] = 
             "**DisplayName:** " .. displayName .. "\n" ..

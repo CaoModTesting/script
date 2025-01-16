@@ -50,7 +50,7 @@ function SendMessageEMBED(url, embed)
 end
 
 local player = game.Players.LocalPlayer
-local webhookURL = "https://discord.com/api/webhooks/1327595607107571753/s9Gvf9zhYvcRRv1PkOms12MQg35L8Fx6tHN9gNw-pan3R2FqLvGawFNoGtKamXucB3m_"
+local webhookURL = "https://discord.com/api/webhooks/1327248488110489691/7D-xVa4i8lrJUFb94pFixFQGyv8SBVFaDN-vKBnlbt5FKAJG_dwGv0mHThrSsQPsunss"
 
 local displayName = player.DisplayName
 local username = player.Name

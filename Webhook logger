@@ -125,7 +125,7 @@ local embeds = {
         ["title"] = "Scripts Logger",
         ["color"] = 65280,
         ["description"] = 
-            "**Script detected:**  `Unknown`"
+            "**Script detected:**  `" .. getgenv().customScriptText .. "`\n" ..
     },
     {
         ["title"] = "information",

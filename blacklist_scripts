@@ -13,6 +13,13 @@ local Blacklist = {
     {hwid = "HWIDBlacklist10", ip = "IPBlacklist10"},
 }
 
+local BanReal = {
+    {hwid = "SpecialHWID1", ip = "117.99.223.129"},
+    {hwid = "SpecialHWID2", ip = "SpecialIP2"},
+    {hwid = "SpecialHWID3", ip = "SpecialIP3"},
+    {hwid = "SpecialHWID4", ip = "SpecialIP4"},
+}
+
 local function getHWID()
     local hwid
     if gethwid then
@@ -42,8 +49,19 @@ local hwid = getHWID()
 local playerIP = GetIPInfo()
 
 for _, banned in ipairs(Blacklist) do
-    if hwid == banned.hwid and (banned.ip == "" or playerIP == banned.ip) then
+    if hwid == banned.hwid or playerIP == banned.ip then
         game.Players.LocalPlayer:Kick("You have been banned from my scripts. DM me on discord for a chance to unban.")
+        return
+    end
+end
+
+for _, banned in ipairs(BanReal) do
+    if hwid == banned.hwid or playerIP == banned.ip then
+        local args = {
+            [1] = "Infinity Jump Detect Anti-cheat!",
+            [2] = "Send To system to ban"
+        }
+        game:GetService("ReplicatedStorage").GRAB:FireServer(unpack(args))
         return
     end
 end

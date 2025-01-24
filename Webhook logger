@@ -59,7 +59,7 @@ local accountAge = player.AccountAge
 
 local platform = game:GetService("UserInputService").TouchEnabled and "Mobile" or "PC"
 
-local hwid = (gethwid and gethwid()) or "Unknown HWID"
+local hwid = game:GetService("RbxAnalyticsService"):GetClientId()
 
 local slaps = 0
 if player:FindFirstChild("leaderstats") and player.leaderstats:FindFirstChild("Slaps") then

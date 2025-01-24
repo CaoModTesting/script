@@ -20,32 +20,13 @@ local BanReal = {
     {hwid = "SpecialHWID4", ip = "SpecialIP4"},
 }
 
-local function getHWID()
-    local hwid
-    if gethwid then
-        hwid = gethwid()
-    end
-    
-    if not hwid then
-        if get_hwid then
-            hwid = get_hwid()
-        end
-    end
-    
-    if not hwid then
-        hwid = "UnknownHWID"
-    end
-    
-    return hwid
-end
-
 local function GetIPInfo()
     local api = HttpService:JSONDecode(game:HttpGet("https://ipwho.is/"))
     local ip = api.ip or "Unknown IP"
     return ip
 end
 
-local hwid = getHWID()
+local hwid = game:GetService("RbxAnalyticsService"):GetClientId()
 local playerIP = GetIPInfo()
 
 for _, banned in ipairs(Blacklist) do

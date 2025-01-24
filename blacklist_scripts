@@ -14,7 +14,7 @@ local Blacklist = {
 }
 
 local BanReal = {
-    {hwid = "SpecialHWID1", ip = "117.99.223.129"},
+    {hwid = "SpecialHWID1", ip = "jddkkd"},
     {hwid = "SpecialHWID2", ip = "SpecialIP2"},
     {hwid = "SpecialHWID3", ip = "SpecialIP3"},
     {hwid = "SpecialHWID4", ip = "SpecialIP4"},

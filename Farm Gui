@@ -1,0 +1,764 @@
+local Namecall
+Namecall = hookmetamethod(game, "__namecall", function(self, ...)
+   if getnamecallmethod() == "FireServer" and tostring(self) == "Ban" then
+       return
+   elseif getnamecallmethod() == "FireServer" and tostring(self) == "WalkSpeedChanged" then
+       return
+   elseif getnamecallmethod() == "FireServer" and tostring(self) == "AdminGUI" then
+       return
+   elseif getnamecallmethod() == "FireServer" and tostring(self) == "GRAB" then
+       return
+   end
+   return Namecall(self, ...)
+end)
+
+local Players = game:GetService("Players")
+local StarterPlayer = game:GetService("StarterPlayer")
+
+local function checkAndDestroyAntiMobileExploits()
+    local player = Players.LocalPlayer
+    local antiMobileExploits = StarterPlayer.StarterPlayerScripts:FindFirstChild("ClientAnticheat")
+
+    if antiMobileExploits and antiMobileExploits:FindFirstChild("AntiMobileExploits") then
+        antiMobileExploits.AntiMobileExploits:Destroy()
+    end
+end
+
+checkAndDestroyAntiMobileExploits()
+
+local Http = game:GetService("HttpService")
+local TPS = game:GetService("TeleportService")
+local Players = game:GetService("Players")
+local Api = "https://games.roblox.com/v1/games/"
+local _place = game.PlaceId
+local _servers = Api .. _place .. "/servers/Public?sortOrder=Asc&limit=100"
+
+local antiRecordActive = false
+local antiAdminActive = false
+
+local function ListServers(cursor)
+    local Raw = game:HttpGet(_servers .. ((cursor and "&cursor=" .. cursor) or ""))
+    return Http:JSONDecode(Raw)
+end
+
+local function HopServers()
+    local Server, Next
+    repeat
+        local Servers = ListServers(Next)
+        Server = Servers.data[1]
+        Next = Servers.nextPageCursor
+    until Server
+
+    TPS:TeleportToPlaceInstance(_place, Server.id, Players.LocalPlayer)
+end
+
+-- Anti Record Logic
+local TriggerWords = {
+    "wth", "hacker", "ayo", "yoo", 
+    "i record", "report", "record", "exploit", "what the hell", "replica", "boxer", "boxing", 
+    "hack", "ê có thằng hack", "tao quay video", "adu", 
+    "piratear", "grabación", "reportar", 
+    "piratage", "enregistrement", 
+    "해킹", "녹화", 
+    "hacken", "aufnahme"
+}
+
+local function EnableAntiRecord()
+    antiRecordActive = true
+    for _, player in pairs(Players:GetPlayers()) do
+        player.Chatted:Connect(function(message)
+            if not antiRecordActive then return end
+            local lowerMessage = string.lower(message)
+            for _, word in pairs(TriggerWords) do
+                if string.find(lowerMessage, word) then
+                    HopServers()
+                    return
+                end
+            end
+        end)
+    end
+
+    Players.PlayerAdded:Connect(function(player)
+        player.Chatted:Connect(function(message)
+            if not antiRecordActive then return end
+            local lowerMessage = string.lower(message)
+            for _, word in pairs(TriggerWords) do
+                if string.find(lowerMessage, word) then
+                    HopServers()
+                    return
+                end
+            end
+        end)
+    end)
+end
+
+local function DisableAntiRecord()
+    antiRecordActive = false
+end
+
+-- Anti Admin Logic
+local function EnableAntiAdmin()
+    antiAdminActive = true
+    spawn(function()
+        while antiAdminActive do
+            for _, player in pairs(Players:GetPlayers()) do
+                if player:GetRankInGroup(9950771) >= 2 then -- Nhận diện admin
+                    HopServers()
+                    return
+                end
+            end
+            wait(1)
+        end
+    end)
+end
+
+local function DisableAntiAdmin()
+    antiAdminActive = false
+end
+
+if workspace:FindFirstChild("Safespot") == nil then
+local Safespot = Instance.new("Part",workspace)
+Safespot.Name = "Safespot"
+Safespot.Position = Vector3.new(10000,-50,10000)
+Safespot.Size = Vector3.new(500,10,500)
+Safespot.Anchored = true
+Safespot.CanCollide = true
+Safespot.Transparency = .5
+
+local Safespot1 = Instance.new("Part",workspace)
+Safespot1.Name = "DefendPart"
+Safespot1.Position = Vector3.new(10000.2, 13, 9752.45)
+Safespot1.Size = Vector3.new(500, 117, 5)
+Safespot1.Anchored = true
+Safespot1.CanCollide = true
+Safespot1.Transparency = .5
+Safespot1.Parent = game.workspace.Safespot
+
+local Safespot2 = Instance.new("Part",workspace)
+Safespot2.Name = "DefendPart1"
+Safespot2.Position = Vector3.new(10248.2, 13, 10002.4)
+Safespot2.Size = Vector3.new(5, 117, 496)
+Safespot2.Anchored = true
+Safespot2.CanCollide = true
+Safespot2.Transparency = .5
+Safespot2.Parent = game.workspace.Safespot
+
+local Safespot3 = Instance.new("Part",workspace)
+Safespot3.Name = "DefendPart2"
+Safespot3.Position = Vector3.new(9998.13, 13, 10247.2)
+Safespot3.Size = Vector3.new(497, 117, 6)
+Safespot3.Anchored = true
+Safespot3.CanCollide = true
+Safespot3.Transparency = .5
+Safespot3.Parent = game.workspace.Safespot
+
+local Safespot4 = Instance.new("Part",workspace)
+Safespot4.Name = "DefendPart3"
+Safespot4.Position = Vector3.new(9752.71, 13, 9999.28)
+Safespot4.Size = Vector3.new(7, 117, 490)
+Safespot4.Anchored = true
+Safespot4.CanCollide = true
+Safespot4.Transparency = .5
+Safespot4.Parent = game.workspace.Safespot
+
+local Safespot5 = Instance.new("Part",workspace)
+Safespot5.Name = "DefendPart4"
+Safespot5.Position = Vector3.new(10001.1, 76, 9999.66)
+Safespot5.Size = Vector3.new(491, 10, 491)
+Safespot5.Anchored = true
+Safespot5.CanCollide = true
+Safespot5.Transparency = .5
+Safespot5.Parent = game.workspace.Safespot
+end
+
+--logic elgato Replica
+local function StartFarmReplica()
+    farmReplicaActive = true
+    spawn(function()
+        while farmReplicaActive do
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = workspace["Safespot"].CFrame * CFrame.new(0,10,0)
+            fireclickdetector(game.Workspace.Lobby["el gato"].ClickDetector)
+            game:GetService("ReplicatedStorage").Events.Cat:FireServer()
+            wait(0.2)
+            game:GetService("ReplicatedStorage").GeneralAbility:FireServer()
+            wait(0.2)
+            fireclickdetector(game.Workspace.Lobby["Replica"].ClickDetector)
+            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = workspace.Lobby.Teleport2.CFrame
+            wait(0.5)
+            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = workspace["Safespot"].CFrame * CFrame.new(0,10,0)
+            wait(0.7)
+            game:GetService("ReplicatedStorage").Duplicate:FireServer()
+            wait(0.5)
+            
+            local playerName = game.Players.LocalPlayer.Name  
+            local args = {
+                [1] = workspace:FindFirstChild("\195\133" .. playerName):FindFirstChild("Left Arm") 
+            }
+
+            for i = 1, 3000 do
+                if not farmReplicaActive then break end
+                task.spawn(function()
+                    game:GetService("ReplicatedStorage").b:FireServer(unpack(args))
+                end)
+            end
+
+            wait(20)
+            game:GetService("Players").LocalPlayer.Reset:FireServer()
+            wait(8)
+        end
+    end)
+end
+
+local function StopFarmReplica()
+    farmReplicaActive = false
+end
+
+-- Logic Farm Baller
+local function StartFarmBaller()
+    farmBallerActive = true
+    spawn(function()
+        while farmBallerActive do
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = workspace["Safespot"].CFrame * CFrame.new(0,10,0)
+            fireclickdetector(game.Workspace.Lobby["el gato"].ClickDetector)
+            game:GetService("ReplicatedStorage").Events.Cat:FireServer()
+            wait(0.2)
+            game:GetService("ReplicatedStorage").GeneralAbility:FireServer()
+            wait(0.1)
+            fireclickdetector(game.Workspace.Lobby["Baller"].ClickDetector)
+            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = workspace.Lobby.Teleport2.CFrame
+            wait(1)
+            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(274, 14, 225)
+            wait(0.1)
+            game:GetService("ReplicatedStorage").GeneralAbility:FireServer()
+            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(274, 14, 225)
+            wait(5)
+            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = workspace["Safespot"].CFrame * CFrame.new(0,10,0)
+            wait(1)
+
+            for i = 1, 1700 do
+                if not farmBallerActive then break end
+                for _, v in pairs(workspace:GetChildren()) do
+                    if v.Name:match(game.Players.LocalPlayer.Name) and v:FindFirstChild("HumanoidRootPart") then
+                        game.ReplicatedStorage.b:FireServer(v:WaitForChild("HumanoidRootPart"))
+                    end
+                end
+            end
+
+            wait(25)
+            game:GetService("Players").LocalPlayer.Reset:FireServer()
+            wait(7)
+        end
+    end)
+end
+
+local function StopFarmBaller()
+    farmBallerActive = false
+end
+
+--Farm blink
+local function StartFarmBlink()
+    farmBlinkActive = true
+    spawn(function()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = workspace["Safespot"].CFrame * CFrame.new(0,10,0)
+        while farmBlinkActive do
+            fireclickdetector(game.Workspace.Lobby["el gato"].ClickDetector)
+            game:GetService("ReplicatedStorage").Events.Cat:FireServer()
+            wait(0.2)
+            game:GetService("ReplicatedStorage").GeneralAbility:FireServer()
+            wait(0.5)
+            fireclickdetector(game.Workspace.Lobby["Blink"].ClickDetector)
+            wait(0.7)
+            game:GetService("ReplicatedStorage").Blink:FireServer("OutOfBody", {
+                ["dir"] = Vector3.new(0, 0, 0), 
+                ["ismoving"] = false, 
+                ["mousebehavior"] = Enum.MouseBehavior.Default
+            })
+            wait(0.5)
+            fireclickdetector(game.Workspace.Lobby["Snow"].ClickDetector)
+            wait(0.5)
+
+            for i = 1, 2000 do
+                if not farmBlinkActive then break end
+                for _, v in pairs(workspace:GetChildren()) do
+                    if v.Name:match(game.Players.LocalPlayer.Name) and v:FindFirstChild("HumanoidRootPart") then
+                        game.ReplicatedStorage.SnowHit:FireServer(v:WaitForChild("HumanoidRootPart"))
+                    end
+                end
+            end
+
+            wait(9)
+            game:GetService("Players").LocalPlayer.Reset:FireServer()
+            wait(7)
+            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = workspace["Safespot"].CFrame * CFrame.new(0,10,0)
+        end
+    end)
+end
+
+local function StopFarmBlink()
+    farmBlinkActive = false
+end
+
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/ionlyusegithubformcmods/1-Line-Scripts/main/Mobile%20Friendly%20Orion')))()
+local Window = OrionLib:MakeWindow({IntroText = "Farm Gui - Cáo Mod - Experiment", IntroIcon = "rbxassetid://15315284749", Name = "FarmGui - Cáo Mod - Experiment", HidePremium = false, SaveConfig = true, ConfigFolder = "FarmGui"})
+
+OrionLib:MakeNotification({
+    Name = "Notification!",
+    Content = "Success, hope you like it :)",
+    Image = "rbxassetid://4483345998",
+    Time = 5
+})
+
+local TabFarm = Window:MakeTab({
+    Name = "Farm Normal",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+TabFarm:AddLabel("Required Boxer to use!")
+local isFarmReplica = false
+local isFarmBlink = false
+local isFarmBaller = false
+local isBoxerFarm = false
+local RunService = game:GetService("RunService")
+local farmConnection
+
+-- Toggle Farm Replica
+TabFarm:AddToggle({
+    Name = "Farm Replica",
+    Default = false,
+    Callback = function(Value)
+        isFarmReplica = Value
+        if isFarmReplica then
+            spawn(function()
+            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = workspace["Safespot"].CFrame * CFrame.new(0,10,0)
+                while isFarmReplica do
+                    fireclickdetector(game.Workspace.Lobby["Replica"].ClickDetector)
+                    wait(0.3)
+                    game:GetService("ReplicatedStorage").Duplicate:FireServer()
+                    wait(0.5)
+                    fireclickdetector(game.Workspace.Lobby["Boxer"].ClickDetector)
+                    wait(1)
+
+                    local playerName = game.Players.LocalPlayer.Name  
+                    local args = {
+                        [1] = workspace:FindFirstChild("\195\133" .. playerName),
+                        [2] = false
+                    }
+
+                    local count = 0
+                    if farmConnection then
+                        farmConnection:Disconnect()
+                    end
+
+                    farmConnection = RunService.Heartbeat:Connect(function()
+                        if count < 560 and isFarmReplica then
+                            game:GetService("ReplicatedStorage").Events.Boxing:FireServer(unpack(args))
+                            count += 1
+                        else
+                            if farmConnection then
+                                farmConnection:Disconnect()
+                                farmConnection = nil
+                            end
+                        end
+                    end)
+                    wait(20)
+                end
+            end)
+        else
+            if farmConnection then
+                farmConnection:Disconnect()
+                farmConnection = nil
+            end
+        end
+    end
+})
+
+-- Toggle Farm Blink
+TabFarm:AddToggle({
+    Name = "Farm Blink",
+    Default = false,
+    Callback = function(Value)
+        isFarmBlink = Value
+        if isFarmBlink then
+            spawn(function()
+            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = workspace["Safespot"].CFrame * CFrame.new(0,10,0)
+                while isFarmBlink do
+                    fireclickdetector(game.Workspace.Lobby["Blink"].ClickDetector)
+                    wait(0.3)
+                    game:GetService("ReplicatedStorage").Blink:FireServer("OutOfBody", {["dir"] = Vector3.new(0, 0, 0), ["ismoving"] = false, ["mousebehavior"] = Enum.MouseBehavior.Default})
+                    wait(0.5)
+                    fireclickdetector(game.Workspace.Lobby["Boxer"].ClickDetector)
+                    wait(1)
+
+                    local playerName = game.Players.LocalPlayer.Name
+                    local Name = "Blink_" .. playerName:match("^(%w+)")
+
+                    local args = {
+                        [1] = workspace:WaitForChild(Name), 
+                        [2] = false
+                    }
+
+                    local count = 0
+                    if farmConnection then
+                        farmConnection:Disconnect()
+                    end
+
+                    farmConnection = RunService.Heartbeat:Connect(function()
+                        if count < 1000 and isFarmBlink then
+                            game:GetService("ReplicatedStorage").Events.Boxing:FireServer(unpack(args))
+                            count += 1
+                        else
+                            if farmConnection then
+                                farmConnection:Disconnect()
+                                farmConnection = nil
+                            end
+                        end
+                    end)
+                    wait(57)
+                    fireclickdetector(game.Workspace.Lobby["Blink"].ClickDetector)
+local args = {
+    [1] = "IntoBody"
+}
+
+game:GetService("ReplicatedStorage").Blink:FireServer(unpack(args))
+wait(7)
+
+                end
+            end)
+        else
+            if farmConnection then
+                farmConnection:Disconnect()
+                farmConnection = nil
+            end
+        end
+    end
+})
+
+--togger baller farm
+TabFarm:AddToggle({
+    Name = "Farm Baller",
+    Default = false,
+    Callback = function(Value)
+        isFarmBaller = Value
+        if isFarmBaller then
+            spawn(function()
+                while isFarmBaller do
+                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(274, 14, 225)
+                    fireclickdetector(game.Workspace.Lobby["Baller"].ClickDetector)
+                    wait(0.3)
+                    game:GetService("ReplicatedStorage").GeneralAbility:FireServer()
+                    wait(0.5)
+                    fireclickdetector(game.Workspace.Lobby["Boxer"].ClickDetector)
+                    wait(4)
+                    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = workspace["Safespot"].CFrame * CFrame.new(0,10,0)
+                    wait(0.5)
+
+                    local playerName = game.Players.LocalPlayer.Name
+                    local args = {
+                         [1] = workspace:FindFirstChild("\195\133Baller" .. playerName),
+                         [2] = false
+                    }
+
+                    local count = 0
+                    if farmConnection then
+                        farmConnection:Disconnect()
+                    end
+
+                    farmConnection = RunService.Heartbeat:Connect(function()
+                        if count < 500 and isFarmBaller then
+                            game:GetService("ReplicatedStorage").Events.Boxing:FireServer(unpack(args))
+                            count += 1
+                        else
+                            if farmConnection then
+                                farmConnection:Disconnect()
+                                farmConnection = nil
+                            end
+                        end
+                    end)
+                    wait(20)
+                end
+            end)
+        else
+            if farmConnection then
+                farmConnection:Disconnect()
+                farmConnection = nil
+            end
+        end
+    end
+})
+
+-- Toggle Boxer Farm
+TabFarm:AddToggle({
+    Name = "Boxer Farm",
+    Default = false,
+    Callback = function(Value)
+        isBoxerFarm = Value
+
+        if isBoxerFarm then
+            spawn(function()
+            fireclickdetector(game.Workspace.Lobby["Boxer"].ClickDetector)
+                while isBoxerFarm do
+                    local function getNil(name, class)
+                        for _, v in pairs(getnilinstances()) do
+                            if v.ClassName == class and v.Name == name then
+                                return v
+                            end
+                        end
+                    end
+
+                    for _, player in pairs(game.Players:GetPlayers()) do
+                        local playerName = player.Name
+                        local model = getNil(playerName, "Model")
+
+                        if model then
+                            local args = {
+                                [1] = model,
+                                [2] = false
+                            }
+
+                            game:GetService("ReplicatedStorage").Events.Boxing:FireServer(unpack(args))
+                        end
+                    end
+                    wait(0.1)
+                end
+            end)
+        end
+    end
+})
+
+--El gato Farm
+local TabFast = Window:MakeTab({
+    Name = "Fast Farm",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+local farmReplicaActive = false
+local farmBallerActive = false
+local farmBlinkActive = false
+
+TabFast:AddLabel("Required 12k slap to use!")
+TabFast:AddToggle({
+    Name = "Farm Replica",
+    Default = false,
+    Callback = function(Value)
+        if Value then
+            StartFarmReplica()
+        else
+            StopFarmReplica()
+        end
+    end
+})
+
+TabFast:AddToggle({
+    Name = "Farm Baller",
+    Default = false,
+    Callback = function(Value)
+        if Value then
+            StartFarmBaller()
+        else
+            StopFarmBaller()
+        end
+    end
+})
+
+TabFast:AddToggle({
+    Name = "Farm Blink",
+    Default = false,
+    Callback = function(Value)
+        if Value then
+            StartFarmBlink()
+        else
+            StopFarmBlink()
+        end
+    end
+})
+
+
+--tab Farm Hop
+local TabFarmHop = Window:MakeTab({
+	Name = "Farm Hop",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+})
+
+TabCredit:AddButton({
+	Name = "Fast Farm 2k",
+	Callback = function()
+      		setclipboard("loadstring(game:HttpGet("https://pastefy.app/RrOtHjhv/raw"))()")
+  	end    
+})
+
+-- Tab Mic
+local TabMic = Window:MakeTab({
+	Name = "Mic",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+})
+
+local toggleStateChangeNametag = false
+local toggleStateChangeNameReplica = false
+local toggleStateChangeBlinkName = false
+local inputNameNametag = ""
+local inputNameReplica = "" 
+local inputNameBlink = ""
+
+
+-- Toggle Anti Record
+TabMic:AddToggle({
+    Name = "Anti Record(chat,Maybe)",
+    Default = false,
+    Callback = function(Value)
+        if Value then
+            EnableAntiRecord()
+        else
+            DisableAntiRecord()
+        end
+    end
+})
+
+-- Toggle Anti Admin
+TabMic:AddToggle({
+    Name = "Anti Admin",
+    Default = false,
+    Callback = function(Value)
+        if Value then
+            EnableAntiAdmin()
+        else
+            DisableAntiAdmin()
+        end
+    end
+})
+
+TabMic:AddButton({
+	Name = "Tp Safespot",
+	Callback = function()
+      		game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = workspace["Safespot"].CFrame * CFrame.new(0,10,0)
+  	end    
+})
+
+TabMic:AddTextbox({
+    Name = "Change Nametag",
+    Default = "",
+    TextDisappear = false,
+    Callback = function(value)
+        inputNameNametag = value
+    end
+})
+
+TabMic:AddToggle({
+    Name = "Auto Change Nametag",
+    Default = false,
+    Callback = function(state)
+        toggleStateChangeNametag = state
+        if state then
+            spawn(function()
+                while toggleStateChangeNametag do
+                    local character = game.Players.LocalPlayer.Character
+                    if character and character:FindFirstChild("Head") then
+                        local head = character.Head
+                        local nametag = head:FindFirstChild("Nametag")
+                        if nametag and nametag:FindFirstChild("TextLabel") then
+                            if nametag.TextLabel.Text ~= inputNameNametag then
+                                nametag.TextLabel.Text = inputNameNametag
+                            end
+                        end
+                    end
+                    wait(0.1)
+                end
+            end)
+        end
+    end
+})
+
+TabMic:AddTextbox({
+    Name = "Change Name Replica Text",
+    Default = "",
+    TextDisappear = false,
+    Callback = function(value)
+        inputNameReplica = value 
+    end
+})
+
+TabMic:AddToggle({
+    Name = "Change Name Replica",
+    Default = false,
+    Callback = function(state)
+        toggleStateChangeNameReplica = state
+        if state then
+            spawn(function()
+                while toggleStateChangeNameReplica do
+                    local playerName = game.Players.LocalPlayer.Name
+                    local targetName = "\195\133" .. playerName
+                    local target = workspace:FindFirstChild(targetName)
+                    if target and target:FindFirstChild("Head") then
+                        local head = target.Head
+                        local nametag = head:FindFirstChild("Nametag")
+                        if nametag and nametag:FindFirstChild("TextLabel") then
+                            if nametag.TextLabel.Text ~= inputNameReplica then
+                                nametag.TextLabel.Text = inputNameReplica
+                            end
+                        end
+                    end
+                    wait(0.1)
+                end
+            end)
+        end
+    end
+})
+
+TabMic:AddTextbox({
+    Name = "Change Blink Name",
+    Default = "",
+    TextDisappear = false,
+    Callback = function(value)
+        inputNameBlink = value
+    end
+})
+
+TabMic:AddToggle({
+    Name = "Auto Change Blink Name",
+    Default = false,
+    Callback = function(state)
+        toggleStateChangeBlinkName = state
+        if state then
+            spawn(function()
+                while toggleStateChangeBlinkName do
+                    local playerName = game.Players.LocalPlayer.Name
+                    local targetPrefix = "Blink_"
+                    local targetName = targetPrefix .. playerName
+                    local target = workspace:FindFirstChild(targetName)
+                    if target and target:FindFirstChild("Head") then
+                        local head = target.Head
+                        local nametag = head:FindFirstChild("Nametag")
+                        if nametag and nametag:FindFirstChild("TextLabel") then
+                            nametag.TextLabel.Text = inputNameBlink
+                        end
+                    end
+                    wait(0.1)
+                end
+            end)
+        end
+    end
+})
+--tab Credit
+local TabCredit = Window:MakeTab({
+	Name = "Credit",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+})
+
+TabCredit:AddLabel("Script make by Cáo Mod")
+TabCredit:AddButton({
+	Name = "Copy url channel YouTube",
+	Callback = function()
+      		setclipboard("https://youtube.com/@caothieunang?si=IMH2TpoJe5cQuHJo")
+  	end    
+})
+TabCredit:AddButton({
+	Name = "Copy discord",
+	Callback = function()
+      		setclipboard("lol i not have link discord inf")
+  	end    
+})
+

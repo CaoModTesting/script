@@ -299,7 +299,7 @@ local function StopFarmBlink()
 end
 
 local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/ionlyusegithubformcmods/1-Line-Scripts/main/Mobile%20Friendly%20Orion')))()
-local Window = OrionLib:MakeWindow({IntroText = "Farm Gui - Cáo Mod - Experiment", IntroIcon = "rbxassetid://15315284749", Name = "FarmGui - Cáo Mod - Experiment", HidePremium = false, SaveConfig = true, ConfigFolder = "FarmGui"})
+local Window = OrionLib:MakeWindow({IntroText = "Farm Gui - Cáo Mod - testing", IntroIcon = "rbxassetid://15315284749", Name = "FarmGui - Cáo Mod - Testing", HidePremium = false, SaveConfig = true, ConfigFolder = "FarmGui"})
 
 OrionLib:MakeNotification({
     Name = "Notification!",
@@ -582,11 +582,11 @@ local TabFarmHop = Window:MakeTab({
 	PremiumOnly = false
 })
 
-TabCredit:AddButton({
+TabFarmHop:AddButton({
 	Name = "Fast Farm 2k",
 	Callback = function()
-      		setclipboard("loadstring(game:HttpGet("https://pastefy.app/RrOtHjhv/raw"))()")
-  	end    
+		setclipboard("loadstring(game:HttpGet('https://pastefy.app/RrOtHjhv/raw'))()")
+	end    
 })
 
 -- Tab Mic

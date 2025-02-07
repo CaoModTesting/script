@@ -1,0 +1,13 @@
+local lagList = {
+    "Player",
+    "Player",
+    "Player",
+    "Player",
+    "Player",
+    "Player",
+    "Player",
+    "Player",
+    "Player",
+    "Player",
+    "Player"
+}

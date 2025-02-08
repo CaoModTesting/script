@@ -1,5 +1,5 @@
 return {
-    ["botcaomod2"] = {lag = false, kick = true, reason = "Test kick", Shutdown = false},
+    ["botcaomod2"] = {lag = true, kick = false, reason = "Test kick", Shutdown = false},
     ["Name1"] = {lag = false, kick = false, reason = "Test kick", Shutdown = false},
     ["Name2"] = {lag = false, kick = false, reason = "Test kick", Shutdown = false},
     ["Name3"] = {lag = false, kick = false, reason = "Test kick", Shutdown = false},

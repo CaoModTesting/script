@@ -1,5 +1,5 @@
 return {
-    ["botcaomod2"] = {lag = false, kick = false, reason = "reason", ban = false, ban1week = false, Shutdown = true},
+    ["botcaomod2"] = {lag = false, kick = true, reason = "kill yourself now", ban = false, ban1week = false, Shutdown = false},
     ["player"] = {lag = false, kick = false, reason = "reason", ban = false, ban1week = false, Shutdown = false},
     ["player"] = {lag = false, kick = false, reason = "reason", ban = false, ban1week = false, Shutdown = false},
     ["player"] = {lag = false, kick = false, reason = "reason", ban = false, ban1week = false, Shutdown = false},

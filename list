@@ -1,5 +1,5 @@
 return {
-    botcaomod = true,
+    botcaomod2 = true,
     Player1 = false,
     Player2 = true
 }

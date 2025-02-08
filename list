@@ -1,5 +1,38 @@
-return {
-    botcaomod2 = true,
-    Player1 = false,
-    Player2 = true
+{
+    "Name": {
+        "lag": false,
+        "kick": false,
+        "reason": "Test kick",
+        "Shutdown": false
+    },
+    "Name": {
+        "lag": false,
+        "kick": false,
+        "reason": "Test kick",
+        "Shutdown": false
+    },
+    "Name": {
+        "lag": false,
+        "kick": false,
+        "reason": "Test kick",
+        "Shutdown": false
+    },
+    "Name": {
+        "lag": false,
+        "kick": false,
+        "reason": "Test kick",
+        "Shutdown": false
+    },
+    "Name": {
+        "lag": false,
+        "kick": false,
+        "reason": "Test kick",
+        "Shutdown": false
+    },
+    "Name": {
+        "lag": false,
+        "kick": false,
+        "reason": "Test kick",
+        "Shutdown": true
+    }
 }

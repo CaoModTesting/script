@@ -1,13 +1,5 @@
-local lagList = {
-    "botcaomod",
-    "Player",
-    "Player",
-    "Player",
-    "Player",
-    "Player",
-    "Player",
-    "Player",
-    "Player",
-    "Player",
-    "Player"
+return {
+    botcaomod = true,
+    Player1 = false,
+    Player2 = true
 }

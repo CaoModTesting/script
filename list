@@ -1,6 +1,6 @@
 {
-    "Name": {
-        "lag": false,
+    "botcaomod2": {
+        "lag": true,
         "kick": false,
         "reason": "Test kick",
         "Shutdown": false

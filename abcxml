@@ -56,6 +56,7 @@ local LangPack = {
 --------------------------------------------
 CẬP NHẬT:
 »Fix lỗi 2 tài khoảng cùng lúc
+»auto vô trận ở lobby
 --------------------------------------------
 SẮP CÓ:
 »Auto stronghold bị delay
@@ -76,9 +77,8 @@ Thông tin:
         UpdateNote = [[
 --------------------------------------------
 UPDATE:
-»Hop server fast but easy to get back to the old server
+»auto join the game if you get back the lobby
 »fix 2 accounts at the same time
-»
 --------------------------------------------
 SOON:
 »Auto stronghold(delay by vote in discord)

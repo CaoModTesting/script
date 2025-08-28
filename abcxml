@@ -1,0 +1,366 @@
+--getgenv().WebhookURL = "" --If not used do not write anything
+if game.PlaceId == 79546208627805 then
+    local ReplicatedStorage = game:GetService("ReplicatedStorage")
+    local TeleportEvent = ReplicatedStorage:FindFirstChild("RemoteEvents") and ReplicatedStorage.RemoteEvents:FindFirstChild("TeleportEvent")
+
+    if TeleportEvent then
+        local function TeleportAdd(num)
+            local args = {
+                [1] = "Add",
+                [2] = num
+            }
+            TeleportEvent:FireServer(unpack(args))
+            task.wait(0.5)
+            TeleportEvent:FireServer("Chosen", nil, 1)
+        end
+
+        -- spam liên tục trong thread riêng
+        task.spawn(function()
+            while true do
+                TeleportAdd(3)
+                TeleportAdd(2)
+                TeleportAdd(1)
+                task.wait(0.3)
+            end
+        end)
+    else
+        warn("Không tìm thấy TeleportEvent, bỏ qua spam.")
+    end
+end
+
+
+--// Services
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local CoreGui = game:GetService("StarterGui")
+local TeleportService = game:GetService("TeleportService")
+local Workspace = game:GetService("Workspace")
+local Remote = game:GetService("ReplicatedStorage").RemoteEvents.RequestTakeDiamonds
+local Interface = LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("Interface")
+local DiamondCount = Interface:WaitForChild("DiamondCount"):WaitForChild("Count")
+
+local function detectLang()
+    local locale = LocalPlayer.LocaleId:lower() -- ví dụ: vi-vn, en-us
+    if string.find(locale, "vi") then
+        return "vi"
+    else
+        return "en"
+    end
+end
+
+local LangPack = {
+    ["vi"] = {
+        GuiTitle = "Farm diamond V36 | Credit: Cáo Mod",
+        Diamonds = "Diamond: ",
+        UpdateNote = [[
+--------------------------------------------
+CẬP NHẬT:
+»Fix lỗi 2 tài khoảng cùng lúc
+--------------------------------------------
+SẮP CÓ:
+»Auto stronghold bị delay
+--------------------------------------------
+Thông tin:
+»Youtube: Cáo Mod
+»Nếu có bug hãy report trên Discord
+»Cảm ơn vì đã test script farm
+»Chúc bạn farm vui vẻ!
+]],
+        CopyBtn = "Sao chép link Discord",
+        NotifyWaiting = "Đang chờ HumanoidRootPart...",
+        NotifyBegin = "Bắt đầu farm!"
+    },
+    ["en"] = {
+        GuiTitle = "Farm diamond V67 | Credit: Cáo Mod",
+        Diamonds = "Diamonds: ",
+        UpdateNote = [[
+--------------------------------------------
+UPDATE:
+»Hop server fast but easy to get back to the old server
+»fix 2 accounts at the same time
+»
+--------------------------------------------
+SOON:
+»Auto stronghold(delay by vote in discord)
+--------------------------------------------
+Info:
+»Youtube: Cáo Mod
+»If there is any bug please report it on discord
+»Thanks for testing this farm script
+»Enjoy farming diamonds!
+]],
+        CopyBtn = "Copy Discord Link",
+        NotifyWaiting = "Waiting for HumanoidRootPart...",
+        NotifyBegin = "Begin farming!"
+    }
+}
+
+local Lang = LangPack[detectLang()]
+
+--// Functions
+local function rainbowStroke(x)
+    task.spawn(function()
+        while task.wait() do
+            for i = 0, 1, 0.01 do
+                x.Color = Color3.fromHSV(i, 1, 1)
+                task.wait(0.02)
+            end
+        end
+    end)
+end
+
+local function notify(ti, te, du)
+    pcall(function()
+        CoreGui:SetCore("SendNotification", {
+            Title = ti or "Info",
+            Text = te or "",
+            Duration = du or 3
+        })
+    end)
+end
+
+local function hopServer(r)
+    local placeId = game.PlaceId
+    task.delay(1, function()
+        TeleportService:Teleport(placeId, LocalPlayer)
+    end)
+    LocalPlayer:Kick(r or "Hop server")
+end
+
+local function sendWebhook(looted, total, chestType)
+    local HttpService = game:GetService("HttpService")
+    local WebhookURL = getgenv().WebhookURL
+    if not WebhookURL then return end
+
+    local embed = {
+        ["title"] = "Farm Announcement",
+        ["color"] = 65280,
+        ["fields"] = {
+            {["name"] = "Diamonds Collected ", ["value"] = tostring(looted), ["inline"] = true},
+            {["name"] = "Total Diamonds", ["value"] = tostring(total), ["inline"] = true},
+            {["name"] = "Source", ["value"] = chestType, ["inline"] = true}
+        },
+        ["footer"] = {["text"] = "Cáo Mod Farm Diamond Script | Subscribe to Cáo Mod"}
+    }
+
+    local headers = { ["Content-Type"] = "application/json" }
+    local body = HttpService:JSONEncode({ embeds = { embed } })
+
+    pcall(function()
+        request({
+            Url = WebhookURL,
+            Method = "POST",
+            Headers = headers,
+            Body = body
+        })
+    end)
+end
+
+task.spawn(function()
+    while task.wait(1) do
+        local displayName = LocalPlayer.DisplayName
+        local targetName = displayName .. " Body"
+        local chars = Workspace:FindFirstChild("Characters")
+        if chars and chars:FindFirstChild(targetName) then
+            hopServer("player is dead")
+            return
+        end
+    end
+end)
+
+--\\ Ui
+local a = Instance.new("ScreenGui", game.CoreGui)
+a.Name = "Farm diamond Skibidi"
+
+local b = Instance.new("Frame", a)
+b.Size = UDim2.new(0, 250, 0, 340)
+b.Position = UDim2.new(0, 80, 0, 20)
+b.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+b.BorderSizePixel = 0
+b.Active = true
+b.Draggable = true
+
+local c = Instance.new("UICorner", b)
+c.CornerRadius = UDim.new(0, 8)
+
+local d = Instance.new("UIStroke", b)
+d.Thickness = 1.5
+rainbowStroke(d)
+
+local e = Instance.new("TextLabel", b)
+e.Size = UDim2.new(1, 0, 0, 30)
+e.BackgroundTransparency = 1
+e.Text = Lang.GuiTitle
+e.TextColor3 = Color3.fromRGB(255, 255, 255)
+e.Font = Enum.Font.GothamBold
+e.TextSize = 14
+e.TextStrokeTransparency = 0.6
+
+local f = Instance.new("TextLabel", b)
+f.Size = UDim2.new(1, -20, 0, 35)
+f.Position = UDim2.new(0, 10, 0, 40)
+f.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+f.TextColor3 = Color3.new(1, 1, 1)
+f.Font = Enum.Font.GothamBold
+f.TextSize = 14
+f.BorderSizePixel = 0
+
+local g = Instance.new("UICorner", f)
+g.CornerRadius = UDim.new(0, 6)
+
+task.spawn(function()
+    while task.wait(0.2) do
+        f.Text = Lang.Diamonds .. DiamondCount.Text
+    end
+end)
+
+local h = Instance.new("Frame", b)
+h.Position = UDim2.new(0, 10, 0, 80)
+h.Size = UDim2.new(1, -20, 0, 250)
+h.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+h.BorderSizePixel = 0
+
+local i = Instance.new("UICorner", h)
+i.CornerRadius = UDim.new(0, 6)
+
+local j = Instance.new("TextLabel", h)
+j.Size = UDim2.new(1, -10, 1, -45)
+j.Position = UDim2.new(0, 5, 0, 5)
+j.BackgroundTransparency = 1
+j.Text = Lang.UpdateNote
+j.TextColor3 = Color3.fromRGB(255, 255, 255)
+j.Font = Enum.Font.Gotham
+j.TextSize = 13
+j.TextWrapped = true
+j.TextYAlignment = Enum.TextYAlignment.Top
+
+local k = Instance.new("TextButton", h)
+k.Size = UDim2.new(0, 150, 0, 30)
+k.Position = UDim2.new(0.5, -75, 1, -35)
+k.Text = Lang.CopyBtn
+k.TextColor3 = Color3.new(1,1,1)
+k.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+k.Font = Enum.Font.GothamBold
+k.TextSize = 12
+k.AutoButtonColor = true
+
+local l = Instance.new("UICorner", k)
+l.CornerRadius = UDim.new(0, 6)
+
+k.MouseButton1Click:Connect(function()
+    setclipboard("https://discord.gg/mSrMzVuc3h")
+    notify("Copied!", "Discord link copied to clipboard", 4)
+end)
+
+notify("Notification", Lang.NotifyWaiting, 3)
+repeat 
+    task.wait(0.5)
+until LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+local hrp = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+notify("Notification", Lang.NotifyBegin, 3)
+
+local initialDiamond = tonumber(DiamondCount.Text) or 0
+
+local ChestList = {}
+for _, v in pairs(workspace.Items:GetChildren()) do
+    if string.find(v.Name, "Chest") and v.Name ~= "Stronghold Diamond Chest" then
+        for _, d in pairs(v:GetDescendants()) do
+            if d:IsA("ProximityPrompt") then
+                table.insert(ChestList, d)
+            end
+        end
+    end
+end
+
+for _, v in pairs(ChestList) do
+    if v and v:IsA("ProximityPrompt") and v.Enabled == true then
+        pcall(function()
+            fireproximityprompt(v)
+        end)
+        task.wait(0.1)
+    end
+end
+
+task.wait(0.5)
+
+local lootStart = tick()
+local lootTimeout = 7
+local diamondsExist = true
+
+while diamondsExist do
+    diamondsExist = false
+    for _, v in pairs(workspace:GetDescendants()) do
+        if v:IsA("Model") and v.Name == "Diamond" then
+            diamondsExist = true
+            if hrp then
+                hrp.CFrame = v:GetPivot() + Vector3.new(0,5,0)
+                hrp.Anchored = true
+                Remote:FireServer(v)
+                task.wait(0.2)
+                hrp.Anchored = false
+            end
+        end
+    end
+
+    
+    if (tick() - lootStart) > lootTimeout then
+        break
+    end
+
+    task.wait(0.2)
+end
+
+wait(1)
+
+--//stronghold
+local stronghold = workspace.Items:FindFirstChild("Stronghold Diamond Chest")
+if stronghold and hrp then
+    hrp.CFrame = stronghold:GetPivot()
+    hrp.Anchored = true
+
+    local proxPrompt
+    repeat
+        task.wait(0.1)
+        local prox = stronghold:FindFirstChild("Main")
+        if prox and prox:FindFirstChild("ProximityAttachment") then
+            proxPrompt = prox.ProximityAttachment:FindFirstChild("ProximityInteraction")
+        end
+    until proxPrompt
+
+    local startTime = tick()
+    while proxPrompt and proxPrompt.Parent and (tick() - startTime) < 10 do
+        pcall(function()
+            fireproximityprompt(proxPrompt)
+        end)
+        task.wait(0.2)
+    end
+
+    if proxPrompt and proxPrompt.Parent then
+        local finalDiamond = tonumber(DiamondCount.Text) or initialDiamond
+        local lootedAmount = finalDiamond - initialDiamond
+        sendWebhook(lootedAmount, finalDiamond, "Stronghold (not raid)")
+        hopServer("auto will be coming soon, hop server ")
+        return
+    end
+
+    repeat task.wait(0.1) until workspace:FindFirstChild("Diamond", true)
+    for _, v in pairs(workspace:GetDescendants()) do
+        if v:IsA("Model") and v.Name == "Diamond" then
+            Remote:FireServer(v)
+        end
+    end
+
+    local finalDiamond = tonumber(DiamondCount.Text) or initialDiamond
+    local lootedAmount = finalDiamond - initialDiamond
+    sendWebhook(lootedAmount, finalDiamond, "Stronghold")
+else
+    wait(1)
+    local finalDiamond = tonumber(DiamondCount.Text) or initialDiamond
+    local lootedAmount = finalDiamond - initialDiamond
+    sendWebhook(lootedAmount, finalDiamond, "Chest")
+    hopServer("No stronghold found")
+    return
+end
+
+task.wait(3)
+hopServer("hop server")

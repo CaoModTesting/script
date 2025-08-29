@@ -1,3 +1,4 @@
+--getgenv().AutoFarm = true
 --getgenv().WebhookURL = "" --If not used do not write anything
 if game.PlaceId == 79546208627805 then
     local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -55,11 +56,8 @@ local LangPack = {
         UpdateNote = [[
 --------------------------------------------
 CẬP NHẬT:
-»Fix lỗi 2 tài khoảng cùng lúc
-»auto vô trận ở lobby
+»Auto stronghold (có thể tắt nó ở getgenv)
 --------------------------------------------
-SẮP CÓ:
-»Auto stronghold bị delay
 --------------------------------------------
 Thông tin:
 »Youtube: Cáo Mod
@@ -77,11 +75,8 @@ Thông tin:
         UpdateNote = [[
 --------------------------------------------
 UPDATE:
-»auto join the game if you get back the lobby
-»fix 2 accounts at the same time
+»Auto stronghold (can be disabled via getgenv)
 --------------------------------------------
-SOON:
-»Auto stronghold(delay by vote in discord)
 --------------------------------------------
 Info:
 »Youtube: Cáo Mod
@@ -335,14 +330,194 @@ if stronghold and hrp then
         task.wait(0.2)
     end
 
-    if proxPrompt and proxPrompt.Parent then
-        local finalDiamond = tonumber(DiamondCount.Text) or initialDiamond
-        local lootedAmount = finalDiamond - initialDiamond
-        sendWebhook(lootedAmount, finalDiamond, "Stronghold (not raid)")
-        hopServer("auto will be coming soon, hop server ")
+    if not getgenv().AutoFarm then
+    local finalDiamond = tonumber(DiamondCount.Text) or initialDiamond
+    local lootedAmount = finalDiamond - initialDiamond
+    sendWebhook(lootedAmount, finalDiamond, "Stronghold (not raid)")
+    hopServer("auto stronghold (Off) Hop...")
+    return
+elseif proxPrompt and proxPrompt.Parent then
+    getgenv().AutoFarm = true
+    notify("Notification", "Starting Auto stronghold...", 5)
+
+        if getgenv().AutoFarm then
+        hrp.Anchored = false
+            notify("AutoFarm", "Starting Cultist farm...", 3)
+            local Players = game:GetService("Players")
+            local ReplicatedStorage = game:GetService("ReplicatedStorage")
+            local VirtualInputManager = game:GetService("VirtualInputManager")
+            local player = Players.LocalPlayer
+            local character = player.Character or player.CharacterAdded:Wait()
+            local hrp = character:WaitForChild("HumanoidRootPart")
+            local initialDiamond = tonumber(DiamondCount.Text) or 0
+            
+            local KillAura = false
+local SelectedTool
+local aurasAtivas = {}
+
+local function ToggleKillAura(state)
+    KillAura = state
+
+    if not state then
+        for npc, _ in pairs(aurasAtivas) do
+            aurasAtivas[npc] = nil
+        end
         return
     end
 
+    if not SelectedTool then
+        for _, tool in ipairs(player.Inventory:GetChildren()) do
+            -- Bro có thể thay "Axe" bằng tên vũ khí khác nếu muốn
+            if tool.Name:find("Axe") then
+                SelectedTool = tool
+                break
+            end
+        end
+    end
+
+    if not SelectedTool then
+        notify("Error", "not found axe", 5)
+        return
+    end
+
+    task.spawn(function()
+        while KillAura do
+            for _, npc in ipairs(workspace.Characters:GetChildren()) do
+                local humanoid = npc:FindFirstChildOfClass("Humanoid")
+                if humanoid and humanoid.Health > 0 and npc.Name:lower():find("cultist") and not aurasAtivas[npc] then
+                    aurasAtivas[npc] = true
+
+                    task.spawn(function()
+                        local ToolID = "27_" .. SelectedTool:GetAttribute("Owner")
+                        local root = npc.PrimaryPart or npc:FindFirstChild("HumanoidRootPart")
+
+                        while aurasAtivas[npc] and root and humanoid.Health > 0 do
+                            pcall(function()
+                                game:GetService("ReplicatedStorage").RemoteEvents.ToolDamageObject:InvokeServer(
+                                    npc, SelectedTool, ToolID, root.CFrame
+                                )
+                            end)
+                            task.wait(0.00001)
+                        end
+                        aurasAtivas[npc] = nil
+                    end)
+                end
+            end
+            task.wait()
+        end
+    end)
+end
+            local wallsFolder = workspace.Map.Landmarks.Stronghold.Building.Interior.Walls
+            local targetSize = Vector3.new(11, 9.19999885559082, 2)
+            local targetPart
+            for _, part in ipairs(wallsFolder:GetChildren()) do
+                if part.Size == targetSize then
+                    targetPart = part
+                    break
+                end
+            end
+
+            if not targetPart then
+                hopServer("Error 234")
+                return
+            end
+
+            local forwardOffset, verticalOffset, rightOffset = 4, -12, 0
+            local localOffset = CFrame.new(rightOffset, verticalOffset, forwardOffset)
+            local KeepTP = true
+            task.spawn(function()
+                while KeepTP do
+                    if hrp and hrp.Parent then
+                        hrp.CFrame = targetPart.CFrame * localOffset
+                    end
+                    task.wait()
+                end
+            end)
+
+            
+            local found = false
+            repeat
+                task.wait(1)
+                for _, npc in ipairs(workspace.Characters:GetChildren()) do
+                    if npc:IsA("Model") and npc.Name:lower():find("cultist") then
+                        local root = npc.PrimaryPart or npc:FindFirstChild("HumanoidRootPart")
+                        if root and hrp then
+                            local dist = (root.Position - hrp.Position).Magnitude
+                            if dist <= 30 then
+                                found = true
+                                break
+                            end
+                        end
+                    end
+                end
+            until found
+            KeepTP = false
+
+            
+            ToggleKillAura(true)
+
+            
+            task.wait(0.2)
+            VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Two, false, game)
+            task.wait(0.1)
+            VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Two, false, game)
+
+            
+            local stronghold = workspace.Items:FindFirstChild("Stronghold Diamond Chest")
+            if stronghold then
+                local chestCFrame
+                if stronghold:IsA("Model") then
+                    chestCFrame = stronghold:GetPivot()
+                elseif stronghold:IsA("BasePart") then
+                    chestCFrame = stronghold.CFrame
+                end
+                if chestCFrame then
+        task.spawn(function()
+            while stronghold.Parent and not workspace:FindFirstChild("Diamond", true) do
+                task.wait(0.1)
+                pcall(function()
+                    hrp.CFrame = chestCFrame + Vector3.new(0, 5, 0) -- đứng cao hơn chest 5 studs cho an toàn
+                end)
+            end
+        end)
+    end
+
+                local proxPrompt
+                repeat
+                    task.wait(0.1)
+                    local prox = stronghold:FindFirstChild("Main")
+                    if prox and prox:FindFirstChild("ProximityAttachment") then
+                        proxPrompt = prox.ProximityAttachment:FindFirstChild("ProximityInteraction")
+                    end
+                until proxPrompt
+
+                repeat
+                    pcall(function()
+                        fireproximityprompt(proxPrompt)
+                    end)
+                    task.wait(0.2)
+                until workspace:FindFirstChild("Diamond", true)
+            end
+            task.wait(3)
+            
+            for _, diamond in ipairs(workspace:GetDescendants()) do
+                if diamond:IsA("Model") and diamond.Name == "Diamond" then
+                    pcall(function()
+                        ReplicatedStorage.RemoteEvents.RequestTakeDiamonds:FireServer(diamond)
+                    end)
+                end
+            end
+
+            
+            local finalDiamond = tonumber(DiamondCount.Text) or initialDiamond
+            local lootedAmount = finalDiamond - initialDiamond
+            sendWebhook(lootedAmount, finalDiamond, "Auto Raid Stronghold")
+            wait(3)
+            hopServer("Auto Raid Stronghold done")
+        end
+        return
+    end
+    
     repeat task.wait(0.1) until workspace:FindFirstChild("Diamond", true)
     for _, v in pairs(workspace:GetDescendants()) do
         if v:IsA("Model") and v.Name == "Diamond" then
@@ -363,4 +538,4 @@ else
 end
 
 task.wait(3)
-hopServer("hop server")
+hopServer("Open done hop server")

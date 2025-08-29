@@ -440,24 +440,31 @@ end
             end)
 
             
-            local found = false
-            repeat
-                task.wait(1)
-                for _, npc in ipairs(workspace.Characters:GetChildren()) do
-                    if npc:IsA("Model") and npc.Name:lower():find("cultist") then
-                        local root = npc.PrimaryPart or npc:FindFirstChild("HumanoidRootPart")
-                        if root and hrp then
-                            local dist = (root.Position - hrp.Position).Magnitude
-                            if dist <= 100 then
-                                found = true
-                                break
-                            end
-                        end
-                    end
-                end
-            until found
-            KeepTP = false
+        local found = false
+local startTime = tick()
 
+repeat
+    task.wait(1)
+    if tick() - startTime > 120 then
+        hopServer("No cultist after 2 minutes, hopping...")
+        return
+    end
+
+    for _, npc in ipairs(workspace.Characters:GetChildren()) do
+        if npc:IsA("Model") and npc.Name:lower():find("cultist") then
+            local root = npc.PrimaryPart or npc:FindFirstChild("HumanoidRootPart")
+            if root and hrp then
+                local dist = (root.Position - hrp.Position).Magnitude
+                if dist <= 100 then
+                    found = true
+                    break
+                end
+            end
+        end
+    end
+until found
+
+KeepTP = false
             
             ToggleKillAura(true)
 

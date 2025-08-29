@@ -307,6 +307,10 @@ end
 
 wait(1)
 
+if getgenv().AutoFarm == nil then
+    getgenv().AutoFarm = true
+end
+
 --//stronghold
 local stronghold = workspace.Items:FindFirstChild("Stronghold Diamond Chest")
 if stronghold and hrp then
@@ -330,14 +334,13 @@ if stronghold and hrp then
         task.wait(0.2)
     end
 
-    if not getgenv().AutoFarm then
+if getgenv().AutoFarm == false then
     local finalDiamond = tonumber(DiamondCount.Text) or initialDiamond
     local lootedAmount = finalDiamond - initialDiamond
     sendWebhook(lootedAmount, finalDiamond, "Stronghold (not raid)")
     hopServer("auto stronghold (Off) Hop...")
     return
 elseif proxPrompt and proxPrompt.Parent then
-    getgenv().AutoFarm = true
     notify("Notification", "Starting Auto stronghold...", 5)
 
         if getgenv().AutoFarm then

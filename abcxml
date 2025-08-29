@@ -313,68 +313,71 @@ if getgenv().AutoFarm == nil then
     getgenv().AutoFarm = false
 end
 
---//stronghold
 local stronghold = workspace.Items:FindFirstChild("Stronghold Diamond Chest")
-if stronghold and hrp then
-    hrp.CFrame = stronghold:GetPivot()
-    hrp.Anchored = true
+if not (stronghold and hrp) then
+    -- Không có chest -> hop luôn
+    local finalDiamond = tonumber(DiamondCount.Text) or initialDiamond
+    local lootedAmount = finalDiamond - initialDiamond
+    sendWebhook(lootedAmount, finalDiamond, "Chest")
+    hopServer("No stronghold found")
+    return
+end
 
-    local proxPrompt
-    repeat
-        task.wait(0.1)
-        local prox = stronghold:FindFirstChild("Main")
-        if prox and prox:FindFirstChild("ProximityAttachment") then
-            proxPrompt = prox.ProximityAttachment:FindFirstChild("ProximityInteraction")
-        end
-    until proxPrompt
+-- Teleport vô chest
+hrp.CFrame = stronghold:GetPivot()
+hrp.Anchored = true
 
-    local startTime = tick()
-    local chestOpened = false
-
-    while proxPrompt and proxPrompt.Parent and (tick() - startTime) < 10 do
-        pcall(function()
-            fireproximityprompt(proxPrompt)
-        end)
-
-        if workspace:FindFirstChild("Diamond", true) then
-            chestOpened = true
-            break
-        end
-
-        task.wait(0.2)
+-- Tìm ProximityPrompt
+local proxPrompt
+repeat
+    task.wait(0.1)
+    local prox = stronghold:FindFirstChild("Main")
+    if prox and prox:FindFirstChild("ProximityAttachment") then
+        proxPrompt = prox.ProximityAttachment:FindFirstChild("ProximityInteraction")
     end
+until proxPrompt
 
-    if chestOpened then
-        repeat task.wait(0.1) until workspace:FindFirstChild("Diamond", true)
+-- Thử mở chest trong 10s
+local startTime = tick()
+local chestOpened = false
+while proxPrompt and proxPrompt.Parent and (tick() - startTime) < 10 do
+    pcall(function() fireproximityprompt(proxPrompt) end)
+    if workspace:FindFirstChild("Diamond", true) then
+        chestOpened = true
+        break
+    end
+    task.wait(0.2)
+end
 
-        for _, v in pairs(workspace:GetDescendants()) do
-            if v:IsA("Model") and v.Name == "Diamond" then
-                pcall(function()
-                    Remote:FireServer(v)
-                end)
-            end
+-- Nếu chest đã có Diamond -> loot xong rồi hop
+if chestOpened then
+    repeat task.wait(0.1) until workspace:FindFirstChild("Diamond", true)
+    for _, v in pairs(workspace:GetDescendants()) do
+        if v:IsA("Model") and v.Name == "Diamond" then
+            pcall(function() Remote:FireServer(v) end)
         end
+    end
+    local finalDiamond = tonumber(DiamondCount.Text) or initialDiamond
+    local lootedAmount = finalDiamond - initialDiamond
+    sendWebhook(lootedAmount, finalDiamond, "Stronghold")
+    task.wait(4)
+    hopServer("Stronghold chest looted, hopping...")
+    return
+end
 
-        local finalDiamond = tonumber(DiamondCount.Text) or initialDiamond
-        local lootedAmount = finalDiamond - initialDiamond
-        sendWebhook(lootedAmount, finalDiamond, "Stronghold")
-
-        task.wait(4)
-        hopServer("Stronghold chest looted, hopping...")
-        return
-    else
-        if getgenv().AutoFarm == false then
-            local finalDiamond = tonumber(DiamondCount.Text) or initialDiamond
-            local lootedAmount = finalDiamond - initialDiamond
-            sendWebhook(lootedAmount, finalDiamond, "Stronghold (not raid)")
-            hopServer("auto stronghold (Off) Hop...")
-            return
-elseif proxPrompt and proxPrompt.Parent then
+-- Nếu không mở được chest
+if not getgenv().AutoFarm then
+    -- AutoFarm off -> webhook rồi hop
+    local finalDiamond = tonumber(DiamondCount.Text) or initialDiamond
+    local lootedAmount = finalDiamond - initialDiamond
+    sendWebhook(lootedAmount, finalDiamond, "Stronghold (not raid)")
+    hopServer("Auto stronghold (Off) Hop...")
+    return
+else
+    -- AutoFarm on -> bắt đầu auto raid
     notify("Notification", "Starting Auto stronghold...", 5)
-
-        if getgenv().AutoFarm then
-        hrp.Anchored = false
-            notify("AutoFarm", "Starting Cultist farm...", 3)
+    hrp.Anchored = false
+    notify("AutoFarm", "Starting Cultist farm...", 3)
             local Players = game:GetService("Players")
             local ReplicatedStorage = game:GetService("ReplicatedStorage")
             local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -553,16 +556,3 @@ KeepTP = false
             wait(3)
             hopServer("Auto Raid Stronghold done")
             end
-        end
-    end
-else
-    wait(1)
-    local finalDiamond = tonumber(DiamondCount.Text) or initialDiamond
-    local lootedAmount = finalDiamond - initialDiamond
-    sendWebhook(lootedAmount, finalDiamond, "Chest")
-    hopServer("No stronghold found")
-    return
-end
-
-task.wait(3)
-hopServer("Open done hop server")

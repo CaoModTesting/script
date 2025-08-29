@@ -310,7 +310,7 @@ end
 wait(1)
 
 if getgenv().AutoFarm == nil then
-    getgenv().AutoFarm = true
+    getgenv().AutoFarm = false
 end
 
 --//stronghold

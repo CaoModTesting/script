@@ -56,8 +56,9 @@ local LangPack = {
         UpdateNote = [[
 --------------------------------------------
 CẬP NHẬT:
-»Auto stronghold (có thể tắt nó ở getgenv)
+»Auto stronghold (beta)(có thể tắt nó ở getgenv)
 --------------------------------------------
+lưu ý auto stronghold chỉ mới update nên rất nhiều lỗi
 --------------------------------------------
 Thông tin:
 »Youtube: Cáo Mod
@@ -75,8 +76,9 @@ Thông tin:
         UpdateNote = [[
 --------------------------------------------
 UPDATE:
-»Auto stronghold (can be disabled via getgenv)
+»Auto stronghold (beta)(can be disabled via getgenv)
 --------------------------------------------
+note:auto stronghold is just beta with lots of bugs, don't enable it
 --------------------------------------------
 Info:
 »Youtube: Cáo Mod

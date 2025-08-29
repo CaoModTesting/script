@@ -511,14 +511,12 @@ end
                 end
             end
 
-            wait(4)
             local finalDiamond = tonumber(DiamondCount.Text) or initialDiamond
             local lootedAmount = finalDiamond - initialDiamond
             sendWebhook(lootedAmount, finalDiamond, "Auto Raid Stronghold")
             wait(3)
             hopServer("Auto Raid Stronghold done")
         end
-        return
     end
     
     repeat task.wait(0.1) until workspace:FindFirstChild("Diamond", true)

@@ -359,9 +359,9 @@ if stronghold and hrp then
         local lootedAmount = finalDiamond - initialDiamond
         sendWebhook(lootedAmount, finalDiamond, "Stronghold")
 
-        task.wait(3)
+        task.wait(4)
         hopServer("Stronghold chest looted, hopping...")
-
+        return
     else
         if getgenv().AutoFarm == false then
             local finalDiamond = tonumber(DiamondCount.Text) or initialDiamond

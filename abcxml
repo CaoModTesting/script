@@ -446,7 +446,7 @@ end
                         local root = npc.PrimaryPart or npc:FindFirstChild("HumanoidRootPart")
                         if root and hrp then
                             local dist = (root.Position - hrp.Position).Magnitude
-                            if dist <= 30 then
+                            if dist <= 100 then
                                 found = true
                                 break
                             end

@@ -501,13 +501,6 @@ KeepTP = false
             
             ToggleKillAura(true)
 
-            
-            task.wait(0.2)
-            VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Two, false, game)
-            task.wait(0.1)
-            VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Two, false, game)
-
-            
             local stronghold = workspace.Items:FindFirstChild("Stronghold Diamond Chest")
             if stronghold then
                 local chestCFrame

@@ -357,10 +357,44 @@ if stronghold and hrp then
             local character = player.Character or player.CharacterAdded:Wait()
             local hrp = character:WaitForChild("HumanoidRootPart")
             local initialDiamond = tonumber(DiamondCount.Text) or 0
-            
+
             local KillAura = false
 local SelectedTool
 local aurasAtivas = {}
+
+local ToolPriority = {
+    "Morningstar",
+    "Katana",
+    "Spear",
+    "Strong Axe",
+    "Good Axe",
+    "Old Axe"
+}
+
+local function EquipTool(tool)
+    if tool and tool:IsDescendantOf(player.Inventory) then
+        local args = {
+            [1] = "FireAllClients",
+            [2] = tool
+        }
+        game:GetService("ReplicatedStorage").RemoteEvents.EquipItemHandle:FireServer(unpack(args))
+        return true
+    end
+    return false
+end
+
+local function SelectTool()
+    for _, toolName in ipairs(ToolPriority) do
+        for _, tool in ipairs(player.Inventory:GetChildren()) do
+            if tool.Name == toolName then
+                if EquipTool(tool) then
+                    return tool
+                end
+            end
+        end
+    end
+    return nil
+end
 
 local function ToggleKillAura(state)
     KillAura = state
@@ -372,26 +406,22 @@ local function ToggleKillAura(state)
         return
     end
 
-    if not SelectedTool then
-        for _, tool in ipairs(player.Inventory:GetChildren()) do
-            -- Bro có thể thay "Axe" bằng tên vũ khí khác nếu muốn
-            if tool.Name:find("Axe") then
-                SelectedTool = tool
-                break
-            end
+    if not SelectedTool or not SelectedTool:IsDescendantOf(player.Backpack) and not SelectedTool:IsDescendantOf(player.Character) then
+        SelectedTool = SelectTool()
+        if not SelectedTool then
+            notify("Error", "No suitable weapon found!", 5)
+            return
         end
-    end
-
-    if not SelectedTool then
-        notify("Error", "not found axe", 5)
-        return
     end
 
     task.spawn(function()
         while KillAura do
             for _, npc in ipairs(workspace.Characters:GetChildren()) do
                 local humanoid = npc:FindFirstChildOfClass("Humanoid")
-                if humanoid and humanoid.Health > 0 and npc.Name:lower():find("cultist") and not aurasAtivas[npc] then
+                if humanoid and humanoid.Health > 0 and 
+                   (npc.Name == "Cultist" or npc.Name == "Crossbow Cultist" or npc.Name == "Juggernaut Cultist") 
+                   and not aurasAtivas[npc] then
+
                     aurasAtivas[npc] = true
 
                     task.spawn(function()
@@ -404,7 +434,7 @@ local function ToggleKillAura(state)
                                     npc, SelectedTool, ToolID, root.CFrame
                                 )
                             end)
-                            task.wait(0.00001)
+                            task.wait(0.00001) -- spam max tốc
                         end
                         aurasAtivas[npc] = nil
                     end)
@@ -414,6 +444,7 @@ local function ToggleKillAura(state)
         end
     end)
 end
+
             local wallsFolder = workspace.Map.Landmarks.Stronghold.Building.Interior.Walls
             local targetSize = Vector3.new(11, 9.19999885559082, 2)
             local targetPart

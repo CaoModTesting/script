@@ -57,6 +57,7 @@ local LangPack = {
 --------------------------------------------
 CẬP NHẬT:
 »Auto stronghold (beta)(có thể tắt nó ở getgenv)
+»new hop sever hop nhanh và ko trùng sever
 --------------------------------------------
 lưu ý auto stronghold chỉ mới update nên rất nhiều lỗi
 --------------------------------------------
@@ -78,6 +79,7 @@ Thông tin:
 UPDATE:
 »Auto stronghold (beta)(can be disabled via getgenv)
 »kill aura without holding tool
+»new hop method (The rate of returning to the old server is extremely low)
 --------------------------------------------
 note:auto stronghold is just beta with lots of bugs, don't enable it
 --------------------------------------------
@@ -96,6 +98,78 @@ Info:
 local Lang = LangPack[detectLang()]
 
 --// Functions
+
+local PlaceID = game.PlaceId
+local AllIDs = {}
+local maxTeleports = 5
+
+local function loadServerList()
+    local ok, data = pcall(function()
+        return HttpService:JSONDecode(readfile("NotSameServers.json"))
+    end)
+    if ok and data then
+        for _, id in ipairs(data) do
+            AllIDs[tostring(id)] = true
+        end
+    else
+        writefile("NotSameServers.json", HttpService:JSONEncode({}))
+    end
+end
+
+local function saveServerList()
+    local list = {}
+    for id in pairs(AllIDs) do
+        table.insert(list, id)
+    end
+    writefile("NotSameServers.json", HttpService:JSONEncode(list))
+end
+
+local function isNewServer(ID)
+    return not AllIDs[ID]
+end
+
+local function teleport(ID)
+    AllIDs[ID] = true
+    saveServerList()
+    pcall(function()
+        TeleportService:TeleportToPlaceInstance(PlaceID, ID, LocalPlayer)
+    end)
+end
+
+local function getServers(cursor)
+    local url = 'https://games.roblox.com/v1/games/' .. PlaceID .. '/servers/Public?sortOrder=Asc&limit=100'
+    if cursor then url = url .. "&cursor=" .. cursor end
+    local ok, res = pcall(function()
+        return HttpService:JSONDecode(game:HttpGet(url))
+    end)
+    return ok and res or nil
+end
+
+local function serverHop()
+    loadServerList()
+    local teleportCount = 0
+    local cursor = nil
+
+    while teleportCount < maxTeleports do
+        local site = getServers(cursor)
+        if not site then break end
+
+        cursor = site.nextPageCursor ~= "null" and site.nextPageCursor or nil
+
+        for _, server in ipairs(site.data) do
+            local id = tostring(server.id)
+            if tonumber(server.playing) < tonumber(server.maxPlayers) and isNewServer(id) then
+                teleport(id)
+                teleportCount += 1
+                wait(0.1)
+                break
+            end
+        end
+
+        if not cursor then break end
+    end
+end
+
 local function rainbowStroke(x)
     task.spawn(function()
         while task.wait() do
@@ -118,11 +192,10 @@ local function notify(ti, te, du)
 end
 
 local function hopServer(r)
-    local placeId = game.PlaceId
-    task.delay(1, function()
-        TeleportService:Teleport(placeId, LocalPlayer)
-    end)
-    LocalPlayer:Kick(r or "Hop server")
+        serverHop()
+    if r then
+        notify("Hop Server", tostring(r), 5)
+    end
 end
 
 local function sendWebhook(looted, total, chestType)

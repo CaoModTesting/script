@@ -77,6 +77,7 @@ Thông tin:
 --------------------------------------------
 UPDATE:
 »Auto stronghold (beta)(can be disabled via getgenv)
+»kill aura without holding tool
 --------------------------------------------
 note:auto stronghold is just beta with lots of bugs, don't enable it
 --------------------------------------------
@@ -521,20 +522,23 @@ KeepTP = false
     end
 
                 local proxPrompt
-                repeat
-                    task.wait(0.1)
-                    local prox = stronghold:FindFirstChild("Main")
-                    if prox and prox:FindFirstChild("ProximityAttachment") then
-                        proxPrompt = prox.ProximityAttachment:FindFirstChild("ProximityInteraction")
-                    end
-                until proxPrompt
+repeat      
+    task.wait(0.1)      
+    local prox = stronghold:FindFirstChild("Main")      
+    if prox and prox:FindFirstChild("ProximityAttachment") then      
+        proxPrompt = prox.ProximityAttachment:FindFirstChild("ProximityInteraction")      
+    end      
+until proxPrompt      
 
-                repeat
-                    pcall(function()
-                        fireproximityprompt(proxPrompt)
-                    end)
-                    task.wait(0.2)
-                until workspace:FindFirstChild("Diamond", true)
+repeat
+    pcall(function()
+        fireproximityprompt(proxPrompt)
+    end)
+    task.wait(0.2)
+until not proxPrompt or not proxPrompt.Parent
+repeat
+    task.wait(0.2)
+until workspace:FindFirstChild("Diamond", true)
             end
             task.wait(3)
             

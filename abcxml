@@ -550,7 +550,7 @@ KeepTP = false
     sendWebhook(lootedAmount, finalDiamond, "Stronghold")
 
     task.wait(3)
-    hopServer("Stronghold looted, hopping...")
+    hopServer("done hopping...")
     return
 else
     wait(1)

@@ -349,6 +349,6 @@ function ServerHop.ForceHop()
 end
 
 return {
-    serverHop = serverHop,
-    forceServerHop = forceServerHop
+    serverHop = ServerHop.Hop,
+    forceServerHop = ServerHop.ForceHop
 }

